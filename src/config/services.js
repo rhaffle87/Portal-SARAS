@@ -1,12 +1,5 @@
 const services = [
-  {
-    key: 'portal',
-    title: 'Portal S4RAS',
-    description: 'Akses utama portal siswa dan civitas.',
-    icon: '🏠',
-    url: 'https://portal.s4ras.site',
-    internalUrl: 'http://192.168.10.208:8080'
-  },
+  // Portal entry removed: portal is the current application and should not link to itself
   {
     key: 'moodle',
     title: 'Moodle LMS',
