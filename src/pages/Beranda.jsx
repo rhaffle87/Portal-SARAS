@@ -20,6 +20,7 @@ function Beranda() {
   const today = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   const formattedDate = today.toLocaleDateString('id-ID', options);
+  const weekday = today.toLocaleDateString('id-ID', { weekday: 'long' });
 
   return (
     <div className="portal-container">
@@ -28,9 +29,9 @@ function Beranda() {
           <h1 className="logo"><span>S4RAS</span> Portal</h1>
         </div>
         <nav className="sidebar-menu">
-          <a href="#" className="menu-item active">🏠 Beranda</a>
-          <a href="#" className="menu-item">👤 Akun</a>
-          <a href="#" className="menu-item">📢 Pengumuman</a>
+          <button type="button" className="menu-item active">🏠 Beranda</button>
+          <button type="button" className="menu-item">👤 Akun</button>
+          <button type="button" className="menu-item">📢 Pengumuman</button>
         </nav>
       </aside>
 
@@ -64,8 +65,8 @@ function Beranda() {
           </div>
 
           <div className="date-card">
-            <div className="day">{today.toLocaleDateString('id-ID', { weekday: 'long' })}</div>
-            <div className="full-date">{today.getDate()} {today.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</div>
+            <div className="day">{weekday}</div>
+            <div className="full-date">{formattedDate}</div>
           </div>
 
           <div className="announcements-card">
