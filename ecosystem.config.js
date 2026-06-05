@@ -10,8 +10,8 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        // Use existing env value if set, otherwise default to the API host placeholder
-        REACT_APP_BACKEND_API_URL: process.env.REACT_APP_BACKEND_API_URL || 'https://api.s4ras.site'
+        // Concrete backend API URL baked into the build when deploy script runs
+        REACT_APP_BACKEND_API_URL: 'https://api.s4ras.site'
       }
     }
   ]
