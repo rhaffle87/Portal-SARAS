@@ -55,14 +55,7 @@ const services = [
     url: 'https://monitor.s4ras.site',
     internalUrl: 'http://192.168.10.204:3000'
   },
-  {
-    key: 'prometheus',
-    title: 'Prometheus',
-    description: 'Sistem monitoring metrik opsional.',
-    icon: '📈',
-    url: 'https://prometheus.s4ras.site',
-    internalUrl: 'http://192.168.10.204:9090'
-  }
+  // Prometheus removed: monitoring.s4ras.site will be managed separately on VM 192.168.10.204
 ];
 
 export default services;
