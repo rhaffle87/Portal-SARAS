@@ -1,0 +1,16 @@
+.admin-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.admin-row:last-child { border-bottom: none; }
+.admin-label { font-weight: 700; }
+.admin-value { text-align: right; }
+.deploy-btn { padding: 8px 12px; border-radius: 8px; background: #0053a0; color: white; border: none; cursor: pointer; }
+.admin-result { margin-top: 12px; background: #f7f7f7; padding: 12px; border-radius: 8px; font-size: 12px; }

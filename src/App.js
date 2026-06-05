@@ -10,6 +10,7 @@ import { KeycloakProvider, useKeycloak } from './context/KeycloakContext';
 import Beranda from './pages/Beranda';
 import Akun from './pages/Akun';
 import Pengumuman from './pages/Pengumuman';
+import Admin from './pages/Admin';
 
 const AppRoutes = () => {
   const { authenticated, initialized } = useKeycloak();
@@ -30,6 +31,7 @@ const AppRoutes = () => {
         <Route path="/home" element={<Beranda />} />
         <Route path="/akun" element={<Akun />} />
         <Route path="/pengumuman" element={<Pengumuman />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
