@@ -1,8 +1,31 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+
+jest.mock('./context/KeycloakContext', () => ({
+  KeycloakProvider: ({ children }) => children,
+  useKeycloak: () => ({
+    authenticated: true,
+    initialized: true,
+    profile: {
+      username: 'ci-user',
+      email: 'ci-user@example.com'
+    }
+  })
+}));
+
+beforeAll(() => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({}),
+  });
+});
+
+afterAll(() => {
+  global.fetch.mockRestore?.();
+});
+
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders the portal home page', async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByText(/Aplikasi dan Layanan/i)).toBeInTheDocument());
 });
