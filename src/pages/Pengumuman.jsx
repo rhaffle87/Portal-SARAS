@@ -1,20 +1,32 @@
 // AnnouncementPage.jsx
 import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import './Pengumuman.css';
-
-const announcements = [
-  { title: 'Lembaga Pengelola Dana Abadi', description: 'Lembaga Pengelola Dana Abadi (LPDA)', badge: 'Lainnya' },
-  { title: 'Peluang Hibah Nasional & Internasional', description: 'Peluang Hibah Nasional & Internasional', badge: 'Kegiatan' },
-  { title: 'Peringatan waspada penipuan...', description: 'Peringatan waspada penipuan atas nama pejabat ITS', badge: 'Sosialisasi' },
-  { title: 'Beasiswa Boeing', description: 'Beasiswa Boeing', badge: 'Kegiatan' },
-  { title: 'panduan UTBK', description: 'Panduan Lengkap UTBK-SNBT 2025 di ITS', badge: 'Sosialisasi' },
-  { title: 'Ibadah Perayaan Paskah Civitas', description: 'Ibadah Perayaan Paskah Civitas Akademika Kristen ITS 2025', badge: 'Kegiatan' },
-  { title: 'Beasiswa ADARO', description: 'Beasiswa ADARO', badge: 'Kegiatan' },
-  { title: 'Women in Technopreneurship', description: 'Program pendanaan produk inovasi menuju pasar', badge: 'Kegiatan' },
-  { title: 'ISICO 2025', description: 'CALL FOR PAPERS AI Powered Business Transformation', badge: 'Kegiatan' },
-];
+import { fetchAnnouncements } from '../services/backend';
 
 function Pengumuman() {
+  const [announcements, setAnnouncements] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let active = true;
+    fetchAnnouncements()
+      .then((data) => {
+        if (active) {
+          setAnnouncements(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div className="portal-container">
       <aside className="sidebar">
@@ -22,9 +34,15 @@ function Pengumuman() {
           <h1 className="logo"><span>S4RAS</span> Portal</h1>
         </div>
         <nav className="sidebar-menu">
-          <a href="#" className="menu-item">🏠 Beranda</a>
-          <a href="#" className="menu-item">👤 Akun</a>
-          <a href="#" className="menu-item active">📢 Pengumuman</a>
+          <NavLink to="/home" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            🏠 Beranda
+          </NavLink>
+          <NavLink to="/akun" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            👤 Akun
+          </NavLink>
+          <NavLink to="/pengumuman" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            📢 Pengumuman
+          </NavLink>
         </nav>
       </aside>
 
@@ -34,15 +52,23 @@ function Pengumuman() {
           <div className="search-button">🔍</div>
         </div>
 
-        <div className="announcement-grid">
-          {announcements.map((item, index) => (
-            <div className="announcement-card" key={index}>
-              <div className="megaphone-icon">📢</div>
-              <div className="announcement-title">{item.title}</div>
-              <div className="announcement-description">{item.description}</div>
-              <div className="announcement-badge">{item.badge}</div>
-            </div>
-          ))}
+        {loading ? (
+          <div className="announcement-loader">Memuat pengumuman...</div>
+        ) : (
+          <div className="announcement-grid">
+            {announcements.map((item, index) => (
+              <div className="announcement-card" key={index}>
+                <div className="megaphone-icon">📢</div>
+                <div className="announcement-title">{item.title}</div>
+                <div className="announcement-description">{item.description || item.desc}</div>
+                <div className="announcement-badge">{item.badge || item.badgeText || 'Info'}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="announcement-actions">
+          <Link to="/home" className="action-button">Kembali ke Beranda</Link>
         </div>
       </main>
     </div>

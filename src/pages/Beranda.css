@@ -193,3 +193,51 @@
     cursor: pointer;
     font-weight: 600;
   }
+
+  .health-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.08);
+  }
+
+  .health-status-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .health-status-row:last-child {
+    border-bottom: none;
+  }
+
+  .health-name {
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .health-detail {
+    font-size: 12px;
+    color: #6f6f6f;
+  }
+
+  .health-indicator {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .status-online {
+    color: #0f5132;
+    background: #d1e7dd;
+  }
+
+  .status-offline {
+    color: #842029;
+    background: #f8d7da;
+  }

@@ -10,10 +10,10 @@ export const KeycloakProvider = ({ children }) => {
   const [keycloak, setKeycloak] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const keycloakInstance = new Keycloak({
-      // 1. UBAH KE DOMAIN HTTPS RESMI REVERSE PROXY ANDA
       url: 'https://sso.s4ras.site', 
       realm: 'S4RAS',
       clientId: 'front-end',
@@ -58,6 +58,11 @@ export const KeycloakProvider = ({ children }) => {
         keycloakInstance.login();
       } else if (auth) {
         console.debug('[Keycloak] authenticated after init', { tokenParsed: keycloakInstance.tokenParsed });
+        keycloakInstance.loadUserProfile().then(profileData => {
+          setProfile(profileData);
+        }).catch(err => {
+          console.warn('[Keycloak] profile fetch failed', err);
+        });
       }
 
       // Clean up URL (remove code/state from hash) after init to avoid re-processing
@@ -79,11 +84,18 @@ export const KeycloakProvider = ({ children }) => {
       setKeycloak(null);
       setAuthenticated(false);
       setInitialized(false);
+      setProfile(null);
     };
   }, []);
 
+  const logout = () => {
+    if (keycloak) {
+      keycloak.logout();
+    }
+  };
+
   return (
-    <KeycloakContext.Provider value={{ keycloak, authenticated, initialized }}>
+    <KeycloakContext.Provider value={{ keycloak, authenticated, initialized, profile, logout }}>
       {children}
     </KeycloakContext.Provider>
   );

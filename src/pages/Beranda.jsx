@@ -1,26 +1,55 @@
 // HomePage.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import './Beranda.css';
-
-const apps = [
-  { name: 'Classroom', desc: 'Materi dan tugas', icon: '🎓' },
-  { name: 'OneCloud', desc: 'Email', icon: '📧' },
-  { name: 'NexaPlay', desc: 'Streaming Service', icon: '👥' },
-  { name: 'Chat', desc: 'A VoIP Service', icon: '🗯️' },
-  { name: 'Settings', desc: 'Pengaturan', icon: '⚙️' },
-];
-
-const announcements = [
-  { title: 'Ijazah Palsu Jokowi Terungkap', desc: 'Peringatan' },
-  { title: 'Fufufafa  IPK 2.3', desc: 'Waspada Indonesia Cemas 2050' },
-  { title: 'Peringatan waspada penipuan atas nama pejabat ITS', desc: 'Peringatan waspada penipuan' },
-];
+import services from '../config/services';
+import { fetchAnnouncements, checkServiceHealth } from '../services/backend';
+import { useKeycloak } from '../context/KeycloakContext';
 
 function Beranda() {
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [healthStatuses, setHealthStatuses] = useState([]);
+  const [healthLoading, setHealthLoading] = useState(true);
+  const { profile } = useKeycloak();
   const today = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   const formattedDate = today.toLocaleDateString('id-ID', options);
   const weekday = today.toLocaleDateString('id-ID', { weekday: 'long' });
+
+  useEffect(() => {
+    let mounted = true;
+    fetchAnnouncements().then((data) => {
+      if (mounted) {
+        setAnnouncements(data);
+        setLoading(false);
+      }
+    }).catch(() => {
+      if (mounted) {
+        setLoading(false);
+      }
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadHealth = async () => {
+      const results = await Promise.all(services.map(checkServiceHealth));
+      if (mounted) {
+        setHealthStatuses(results);
+        setHealthLoading(false);
+      }
+    };
+    loadHealth();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const username = profile?.username || profile?.email || 'Pengguna S4RAS';
 
   return (
     <div className="portal-container">
@@ -29,9 +58,15 @@ function Beranda() {
           <h1 className="logo"><span>S4RAS</span> Portal</h1>
         </div>
         <nav className="sidebar-menu">
-          <button type="button" className="menu-item active">🏠 Beranda</button>
-          <button type="button" className="menu-item">👤 Akun</button>
-          <button type="button" className="menu-item">📢 Pengumuman</button>
+          <NavLink to="/home" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            🏠 Beranda
+          </NavLink>
+          <NavLink to="/akun" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            👤 Akun
+          </NavLink>
+          <NavLink to="/pengumuman" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            📢 Pengumuman
+          </NavLink>
         </nav>
       </aside>
 
@@ -40,27 +75,27 @@ function Beranda() {
           <div className="apps-section">
             <h2>Aplikasi dan Layanan</h2>
             <div className="apps-grid">
-              {apps.map((app, index) => (
-                <div className="app-card" key={index}>
-                  <div className="app-icon">{app.icon}</div>
+              {services.map((service) => (
+                <a key={service.key} href={service.url} target="_blank" rel="noreferrer" className="app-card clickable">
+                  <div className="app-icon">{service.icon}</div>
                   <div>
-                    <div className="app-name">{app.name}</div>
-                    <div className="app-desc">{app.desc}</div>
+                    <div className="app-name">{service.title}</div>
+                    <div className="app-desc">{service.description}</div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
-            <button className="show-all-btn">⬇️ Tampilkan Semua Aplikasi</button>
+            <Link to="/pengumuman" className="show-all-btn">⬇️ Lihat Pengumuman</Link>
           </div>
         </div>
 
         <div className="right-column">
           <div className="profile-card">
-            <div className="profile-icon-large">👨‍🎓</div>
+            <div className="profile-icon-large">👤</div>
             <div className="profile-info">
-              <div className="profile-name">Muhamad Rafi Rabbani</div>
-              <div className="profile-email">rafi.rabbani@saras.com</div>
-              <div className="manage-account">Kelola Akun ➔</div>
+              <div className="profile-name">{username}</div>
+              <div className="profile-email">{profile?.email || 'email@domain.com'}</div>
+              <Link to="/akun" className="manage-account">Kelola Akun ➔</Link>
             </div>
           </div>
 
@@ -69,18 +104,44 @@ function Beranda() {
             <div className="full-date">{formattedDate}</div>
           </div>
 
+          <div className="health-card">
+            <h3>Service Health</h3>
+            {healthLoading ? (
+              <div className="announcement-loader">Memeriksa layanan...</div>
+            ) : (
+              healthStatuses.map((status) => {
+                const service = services.find((item) => item.key === status.key);
+                return (
+                  <div className="health-status-row" key={status.key}>
+                    <div>
+                      <div className="health-name">{service?.title || status.key}</div>
+                      <div className="health-detail">{status.details}</div>
+                    </div>
+                    <div className={`health-indicator ${status.status === 'online' ? 'status-online' : 'status-offline'}`}>
+                      {status.label}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
           <div className="announcements-card">
             <h3>Pengumuman</h3>
-            {announcements.map((item, index) => (
-              <div className="announcement-mini" key={index}>
-                <div className="megaphone-mini">📢</div>
-                <div>
-                  <div className="announcement-title-mini">{item.title}</div>
-                  <div className="announcement-desc-mini">{item.desc}</div>
+            {loading ? (
+              <div className="announcement-loader">Memuat pengumuman...</div>
+            ) : (
+              announcements.map((item, index) => (
+                <div className="announcement-mini" key={index}>
+                  <div className="megaphone-mini">📢</div>
+                  <div>
+                    <div className="announcement-title-mini">{item.title}</div>
+                    <div className="announcement-desc-mini">{item.description || item.desc}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-            <button className="view-all-announcements">Lihat Semua Pengumuman</button>
+              ))
+            )}
+            <Link to="/pengumuman" className="view-all-announcements">Lihat Semua Pengumuman</Link>
           </div>
         </div>
       </main>

@@ -1,5 +1,7 @@
 // AccountPage.jsx
 import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { useKeycloak } from '../context/KeycloakContext';
 import './Akun.css';
 
 const dataSections = [
@@ -7,8 +9,8 @@ const dataSections = [
     title: 'Informasi pribadi',
     subtitle: 'Data yang umumnya ditampilkan di semua web myITS',
     items: [
-      { icon: '🅰️', title: 'Nama', subtitle: 'Ubah nama lengkap dan nama panggilan' },
-      { icon: '📅', title: 'Tanggal Lahir', subtitle: 'Melihat tanggal lahir' },
+      { icon: '🅰️', title: 'Nama', subtitle: 'Perbarui nama lengkap dan nama panggilan' },
+      { icon: '📅', title: 'Tanggal Lahir', subtitle: 'Perbarui tanggal lahir' },
     ],
   },
   {
@@ -23,14 +25,18 @@ const dataSections = [
     title: 'Lainnya',
     subtitle: 'Kata sandi dan preferensi tampilan',
     items: [
-      { icon: '🔑', title: 'Kata Sandi', subtitle: 'Perbarui kata sandi' },
-      { icon: '🔒', title: 'Multi-Factor Authentication', subtitle: 'Kelola multi-factor authentication Anda' },
-      { icon: '⚙️', title: 'Pengaturan Web', subtitle: 'Sesuaikan preferensi tampilan' },
+      { icon: '🔑', title: 'Keamanan Akun', subtitle: 'Atur kata sandi atau MFA' },
+      { icon: '⚙️', title: 'Preferensi', subtitle: 'Sesuaikan tampilan dan preferensi Anda' },
     ],
   },
 ];
 
 function Akun() {
+  const { profile, logout } = useKeycloak();
+  const fullName = profile?.firstName || profile?.username || 'Pengguna S4RAS';
+  const email = profile?.email || 'email@domain.com';
+  const role = profile?.attributes?.role?.[0] || 'Anggota';
+
   return (
     <div className="portal-container">
       <aside className="sidebar">
@@ -38,42 +44,58 @@ function Akun() {
           <h1 className="logo"><span>S4RAS</span> Portal</h1>
         </div>
         <nav className="sidebar-menu">
-          <a href="#" className="menu-item">🏠 Beranda</a>
-          <a href="#" className="menu-item active">👤 Akun</a>
-          <a href="#" className="menu-item">📢 Pengumuman</a>
+          <NavLink to="/home" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            🏠 Beranda
+          </NavLink>
+          <NavLink to="/akun" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            👤 Akun
+          </NavLink>
+          <NavLink to="/pengumuman" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+            📢 Pengumuman
+          </NavLink>
         </nav>
       </aside>
 
       <main className="main-content">
-        <h2 className="section-title">Akun</h2>
-        <div className="profile-section">
-          <div className="profile-pic">
-            <div className="profile-icon">👨‍🎓</div>
-          </div>
-          <div className="account-info">
-            <h2>Muhamad Rafi Rabbani</h2>
-            <p className="role">Siswa</p>
+        <div className="profile-panel">
+          <div className="profile-card">
+            <div className="profile-pic">
+              <div className="profile-icon">👤</div>
+            </div>
+            <div className="profile-info">
+              <div className="profile-name">{fullName}</div>
+              <div className="profile-email">{email}</div>
+              <div className="profile-role">{role}</div>
+              <button className="logout-button" onClick={logout}>Logout</button>
+            </div>
           </div>
         </div>
 
-        {dataSections.map((section, index) => (
-          <section className="section" key={index}>
-            <h3>{section.title}</h3>
-            <p className="section-subtitle">{section.subtitle}</p>
-            {section.items.map((item, idx) => (
-              <div className="section-item" key={idx}>
-                <div className="item-left">
-                  <div className="item-icon">{item.icon}</div>
-                  <div className="item-text">
-                    <div className="item-title">{item.title}</div>
-                    <div className="item-subtitle">{item.subtitle}</div>
+        <section className="account-sections">
+          {dataSections.map((section, index) => (
+            <div className="section" key={index}>
+              <h3>{section.title}</h3>
+              <p className="section-subtitle">{section.subtitle}</p>
+              {section.items.map((item, idx) => (
+                <div className="section-item" key={idx}>
+                  <div className="item-left">
+                    <div className="item-icon">{item.icon}</div>
+                    <div className="item-text">
+                      <div className="item-title">{item.title}</div>
+                      <div className="item-subtitle">{item.subtitle}</div>
+                    </div>
                   </div>
+                  <div className="item-arrow">›</div>
                 </div>
-                <div className="item-arrow">›</div>
-              </div>
-            ))}
-          </section>
-        ))}
+              ))}
+            </div>
+          ))}
+        </section>
+
+        <div className="actions-row">
+          <Link to="/home" className="action-button">Kembali ke Beranda</Link>
+          <Link to="/pengumuman" className="action-button">Lihat Pengumuman</Link>
+        </div>
       </main>
     </div>
   );
