@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import './Portal.css';
 
 function Portal() {
@@ -14,10 +15,10 @@ function Portal() {
           <button className="toggle-btn" onClick={toggleSidebar}>☰</button>
           <h2 className="sidebar-title">Portal S4RAS</h2>
         </div>
-        <a href="#">🏠 <span>Beranda</span></a>
-        <a href="#">👤 <span>Akun</span></a>
-        <a href="#">📢 <span>Pengumuman</span></a>
-        <a href="logout.html" className="logout-btn">⏻ Logout</a>
+        <NavLink to="/home" className="nav-link">🏠 <span>Beranda</span></NavLink>
+        <NavLink to="/akun" className="nav-link">👤 <span>Akun</span></NavLink>
+        <NavLink to="/pengumuman" className="nav-link">📢 <span>Pengumuman</span></NavLink>
+        <a href="/logout" className="logout-btn">⏻ Logout</a>
       </div>
 
       <div className="content">
@@ -58,7 +59,7 @@ function Portal() {
               <img src="announcement.png" alt="icon" />
               <p>Lembaga Pengelola Dana Abadi (LPDA)</p>
             </a>
-            <a href="#" className="btn">Lihat Semua Pengumuman</a>
+            <NavLink to="/pengumuman" className="btn">Lihat Semua Pengumuman</NavLink>
           </div>
         </div>
       </div>

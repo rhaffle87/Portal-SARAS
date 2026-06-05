@@ -17,7 +17,7 @@ function Login() {
           <button type="submit">Login</button>
         </form>
         <p className="forgot-password">
-          <a href="#">Lupa Password?</a>
+          <button type="button" className="link-button">Lupa Password?</button>
         </p>
       </div>
     </div>
