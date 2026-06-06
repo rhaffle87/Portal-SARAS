@@ -47,10 +47,8 @@ jobs:
         run: |
           mkdir -p ~/.ssh
 
-          # Write the private key into the file exactly as stored in the secret
-          cat > ~/.ssh/id_rsa << 'EOF'
-${{ secrets.SSH_PRIVATE_KEY }}
-EOF
+          # Write the private key directly from the secret
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
           # Validate the private key format
@@ -62,14 +60,14 @@ EOF
 
           # Create SSH config for this host
           cat > ~/.ssh/config << EOF
-Host target-server
-  HostName ${{ secrets.SSH_HOST }}
-  Port ${{ secrets.SSH_PORT }}
-  User ${{ secrets.SSH_USER }}
-  IdentityFile ~/.ssh/id_rsa
-  StrictHostKeyChecking accept-new
-  UserKnownHostsFile ~/.ssh/known_hosts
-EOF
+          Host target-server
+            HostName ${{ secrets.SSH_HOST }}
+            Port ${{ secrets.SSH_PORT }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking accept-new
+            UserKnownHostsFile ~/.ssh/known_hosts
+          EOF
           chmod 600 ~/.ssh/config
 
       - name: Test SSH connection
