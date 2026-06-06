@@ -16,9 +16,9 @@ npm run build
 printf "> Restarting PM2 service portal-prod\n"
 if pm2 describe portal-prod > /dev/null 2>&1; then
   # reload to pick up updated environment variables from ecosystem file
-  pm2 startOrReload ecosystem.config.js --env production
+  pm2 startOrReload ecosystem.config.js
 else
-  pm2 startOrReload ecosystem.config.js --env production
+  pm2 startOrReload ecosystem.config.js
 fi
 
 printf "> Deployment complete\n"
