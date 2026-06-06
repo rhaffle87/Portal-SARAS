@@ -69,12 +69,33 @@ export const checkServiceHealth = async (service) => {
           };
         }
       }
+      
+      // If the backend responded but it wasn't ok/online, trust the backend response and mark it offline.
+      // Do not fall back to browser checks.
+      return {
+        key: service.key,
+        status: 'offline',
+        label: 'Offline',
+        details: `Backend returned status ${res.status}`,
+      };
     } catch (error) {
       console.warn(`Backend health check failed for ${service.key}, falling back to browser check.`, error);
     }
   }
 
   // 2. Client-side browser fallback check (direct fetch)
+  // Prevent false-positives for proxy 502/503 responses:
+  // If the backend base URL was defined but the fetch failed (backend down), or if this is not the SSO service,
+  // we default to offline as client-side check with 'no-cors' resolves on proxy error pages.
+  if (service.key !== 'sso' && BACKEND_API_BASE) {
+    return {
+      key: service.key,
+      status: 'offline',
+      label: 'Offline',
+      details: 'Backend health check unreachable',
+    };
+  }
+
   try {
     // Try GET with mode: 'no-cors' since some web servers/gateways reject HEAD requests
     await fetch(service.url, {

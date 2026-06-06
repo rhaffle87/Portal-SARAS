@@ -46,6 +46,34 @@
     background-color: var(--color-neutral-bg1);
   }
 
+  html.light {
+    color-scheme: light;
+    
+    /* Brand overrides */
+    --color-brand: #006097;
+    --color-brand-hover: #004d7a;
+    --color-brand-light: #0284c7;
+    --color-brand-subtle: rgba(0, 96, 151, 0.08);
+
+    /* Light theme background tones */
+    --color-neutral-bg1: #f3f4f6; /* light grey page bg */
+    --color-neutral-bg2: #ffffff; /* pure white cards/panels */
+    --color-neutral-bg3: #e5e7eb; /* list item/input bg */
+    --color-neutral-bg4: #d1d5db;
+    --color-neutral-bg5: #9ca3af;
+    --color-neutral-bg6: #6b7280;
+
+    /* Text colors */
+    --color-text-primary: #111827; /* dark grey text */
+    --color-text-secondary: #4b5563; /* medium grey text */
+    --color-text-muted: #6b7280;
+
+    /* Borders */
+    --color-border-subtle: rgba(0, 0, 0, 0.04);
+    --color-border-default: rgba(0, 0, 0, 0.08);
+    --color-border-strong: rgba(0, 0, 0, 0.15);
+  }
+
   body {
     background-color: var(--color-neutral-bg1);
     color: var(--color-text-primary);
@@ -117,6 +145,34 @@
   border-color: var(--color-brand-light);
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 15px rgba(2, 130, 199, 0.15);
+}
+
+/* Light Mode Glassmorphism Overrides */
+html.light .glass {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+}
+
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+html.light .glass-input {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--color-text-primary);
+}
+
+html.light .glass-input:focus {
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 15px rgba(2, 130, 199, 0.1);
 }
 
 /* General layout card adjustments */

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Moon, Languages, Check, ChevronDown } from 'lucide-react';
 import Layout from '../components/Layout';
 import './Pengaturan.css';
+import { useThemeLanguage } from '../context/ThemeLanguageContext';
 
 function Pengaturan() {
-  const [theme, setTheme] = useState('dark');
-  const [language, setLanguage] = useState('id');
+  const { theme, setTheme, language, setLanguage, t } = useThemeLanguage();
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [showLangDropdown, setShowLangDropdown] = useState(false);
 
@@ -22,7 +22,7 @@ function Pengaturan() {
   return (
     <Layout>
       <div className="settings-page">
-        <h2 className="page-title">Pengaturan Web</h2>
+        <h2 className="page-title">{t('set.title')}</h2>
 
         <div className="settings-grid">
           {/* Theme Settings Card */}
@@ -32,8 +32,8 @@ function Pengaturan() {
                 <Moon size={24} className="settings-icon" aria-hidden="true" />
               </div>
               <div className="settings-info">
-                <h3>Mode Tampilan</h3>
-                <p>Pilih mode tampilan yang nyaman untuk Anda</p>
+                <h3>{t('set.theme_title')}</h3>
+                <p>{t('set.theme_desc')}</p>
               </div>
             </div>
             
@@ -44,7 +44,7 @@ function Pengaturan() {
                 aria-expanded={showThemeDropdown}
                 aria-haspopup="listbox"
               >
-                <span>{theme === 'dark' ? 'Mode Gelap' : 'Mode Terang'}</span>
+                <span>{theme === 'dark' ? t('set.theme.dark') : t('set.theme.light')}</span>
                 <ChevronDown size={18} />
               </button>
               
@@ -56,7 +56,7 @@ function Pengaturan() {
                     role="option"
                     aria-selected={theme === 'dark'}
                   >
-                    <span>Mode Gelap</span>
+                    <span>{t('set.theme.dark')}</span>
                     {theme === 'dark' && <Check size={16} />}
                   </li>
                   <li 
@@ -65,7 +65,7 @@ function Pengaturan() {
                     role="option"
                     aria-selected={theme === 'light'}
                   >
-                    <span>Mode Terang</span>
+                    <span>{t('set.theme.light')}</span>
                     {theme === 'light' && <Check size={16} />}
                   </li>
                 </ul>
@@ -80,8 +80,8 @@ function Pengaturan() {
                 <Languages size={24} className="settings-icon" aria-hidden="true" />
               </div>
               <div className="settings-info">
-                <h3>Bahasa</h3>
-                <p>Pilih bahasa yang Anda gunakan</p>
+                <h3>{t('set.lang_title')}</h3>
+                <p>{t('set.lang_desc')}</p>
               </div>
             </div>
             
@@ -92,7 +92,7 @@ function Pengaturan() {
                 aria-expanded={showLangDropdown}
                 aria-haspopup="listbox"
               >
-                <span>{language === 'id' ? 'Bahasa Indonesia' : 'English'}</span>
+                <span>{language === 'id' ? t('set.lang.id') : t('set.lang.en')}</span>
                 <ChevronDown size={18} />
               </button>
               
@@ -104,7 +104,7 @@ function Pengaturan() {
                     role="option"
                     aria-selected={language === 'id'}
                   >
-                    <span>Bahasa Indonesia</span>
+                    <span>{t('set.lang.id')}</span>
                     {language === 'id' && <Check size={16} />}
                   </li>
                   <li 
@@ -113,7 +113,7 @@ function Pengaturan() {
                     role="option"
                     aria-selected={language === 'en'}
                   >
-                    <span>English</span>
+                    <span>{t('set.lang.en')}</span>
                     {language === 'en' && <Check size={16} />}
                   </li>
                 </ul>

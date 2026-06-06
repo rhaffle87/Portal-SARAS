@@ -1,8 +1,8 @@
 // Beranda — Home Dashboard
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ChevronRight, Calendar, ArrowDown, User, Activity, AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ExternalLink, ChevronRight, User, Activity, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Beranda.css';
 import Layout from '../components/Layout';
 import SkeletonCard from '../components/SkeletonCard';
@@ -10,6 +10,7 @@ import StatusBadge from '../components/StatusBadge';
 import services from '../config/services';
 import { fetchAnnouncements, checkServiceHealth } from '../services/backend';
 import { useKeycloak } from '../context/KeycloakContext';
+import { useThemeLanguage } from '../context/ThemeLanguageContext';
 
 function Beranda() {
   const [announcements, setAnnouncements] = useState([]);
@@ -17,12 +18,15 @@ function Beranda() {
   const [healthStatuses, setHealthStatuses] = useState([]);
   const [healthLoading, setHealthLoading] = useState(true);
   const { profile } = useKeycloak();
+  const { t, language } = useThemeLanguage();
+
+  const [images, setImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const today = new Date();
-  const formattedDate = today.toLocaleDateString('id-ID', {
+  const formattedDate = today.toLocaleDateString(language === 'en' ? 'en-US' : 'id-ID', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
-  const weekday = today.toLocaleDateString('id-ID', { weekday: 'long' });
 
   useEffect(() => {
     let mounted = true;
@@ -44,17 +48,58 @@ function Beranda() {
     return () => { mounted = false; };
   }, []);
 
+  // Fetch images from Pexels
+  useEffect(() => {
+    let mounted = true;
+    const fetchPexelsImages = async () => {
+      try {
+        const res = await fetch('https://api.pexels.com/v1/search?query=technology&per_page=6', {
+          headers: {
+            Authorization: 'DMZgUhy3pvR7MFfeFHhq0VQAPV316svu1vgGdTYJVVH5t0ltDy7RxUCa'
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted && data.photos && data.photos.length > 0) {
+            const urls = data.photos.map(p => p.src.large2x || p.src.large);
+            setImages(urls);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch images from Pexels:', err);
+      }
+    };
+    fetchPexelsImages();
+    return () => { mounted = false; };
+  }, []);
+
+  // Sliding timer
+  useEffect(() => {
+    if (images.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 6000); // change image every 6 seconds
+    return () => clearInterval(timer);
+  }, [images]);
+
   const getGreeting = () => {
     const hr = today.getHours();
-    if (hr < 11) return 'Selamat pagi';
-    if (hr < 15) return 'Selamat siang';
-    if (hr < 19) return 'Selamat sore';
-    return 'Selamat malam';
+    if (hr < 11) return t('home.greeting.morning');
+    if (hr < 15) return t('home.greeting.afternoon');
+    if (hr < 19) return t('home.greeting.evening');
+    return t('home.greeting.night');
   };
 
   const username = profile?.firstName 
     ? `${profile.firstName} ${profile.lastName || ''}`.trim()
     : profile?.username || profile?.email || 'Pengguna S4RAS';
+
+  const fallbackImages = [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1920&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1920&auto=format&fit=crop'
+  ];
+  const activeImages = images.length > 0 ? images : fallbackImages;
 
   // Animation variants
   const containerVariants = {
@@ -72,16 +117,37 @@ function Beranda() {
     show: { opacity: 1, y: 0 }
   };
 
+  const getServiceDesc = (key, defaultDesc) => {
+    const translationKey = `service.desc.${key}`;
+    const trans = t(translationKey);
+    return trans === translationKey ? defaultDesc : trans;
+  };
+
   return (
     <Layout>
       <div className="dashboard-container">
         
-        {/* Welcome Hero Banner */}
+        {/* Welcome Hero Banner with Pexels Background Slider */}
         <section className="welcome-banner card" aria-label="Selamat Datang">
+          <div className="welcome-banner-bg">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={activeImages[currentImageIndex]}
+                src={activeImages[currentImageIndex]}
+                alt="Tech theme background"
+                className="welcome-banner-image"
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+              />
+            </AnimatePresence>
+            <div className="welcome-banner-overlay" />
+          </div>
           <div className="welcome-banner-content">
             <h2 className="welcome-title">{getGreeting()}, {username}!</h2>
             <p className="welcome-subtitle">
-              Hari ini adalah <strong>{formattedDate}</strong>. Anda login menggunakan Single Sign-On (SSO) Portal S4RAS.
+              {t('home.today')} <strong>{formattedDate}</strong>. {t('home.sso_login')}
             </p>
           </div>
         </section>
@@ -90,7 +156,7 @@ function Beranda() {
           {/* Left Column — Application launcher grid */}
           <div className="left-column">
             <section className="card apps-section" aria-label="Aplikasi dan Layanan">
-              <h3 className="section-title">Aplikasi dan Layanan</h3>
+              <h3 className="section-title">{t('home.apps_services')}</h3>
               <motion.div 
                 className="apps-grid"
                 variants={containerVariants}
@@ -107,14 +173,14 @@ function Beranda() {
                     target="_blank"
                     rel="noreferrer"
                     className="app-card"
-                    aria-label={`${service.title} — ${service.description}`}
+                    aria-label={`${service.title} — ${getServiceDesc(service.key, service.description)}`}
                   >
                     <div className="app-icon-wrapper">
                       <span className="app-icon-emoji" aria-hidden="true">{service.icon}</span>
                     </div>
                     <div className="app-info">
                       <div className="app-name">{service.title}</div>
-                      <div className="app-desc">{service.description}</div>
+                      <div className="app-desc">{getServiceDesc(service.key, service.description)}</div>
                     </div>
                     <ExternalLink size={14} className="app-external" aria-hidden="true" />
                   </motion.a>
@@ -126,7 +192,9 @@ function Beranda() {
             <div className="card notice-banner">
               <AlertCircle size={18} className="notice-icon" />
               <div className="notice-text">
-                Butuh bantuan login atau integrasi SSO? Kunjungi halaman <Link to="/pengaturan">Pengaturan Web</Link> atau hubungi admin portal.
+                {t('home.notice.text1')}
+                <Link to="/pengaturan">{t('home.notice.link')}</Link>
+                {t('home.notice.text2')}
               </div>
             </div>
           </div>
@@ -145,7 +213,7 @@ function Beranda() {
                 </div>
               </div>
               <Link to="/akun" className="widget-action-btn">
-                <span>Kelola Profil Akun</span>
+                <span>{t('account.manage_btn')}</span>
                 <ChevronRight size={16} />
               </Link>
             </div>
@@ -154,7 +222,7 @@ function Beranda() {
             <div className="card health-card" aria-label="Status Layanan">
               <h4 className="widget-heading">
                 <Activity size={16} />
-                <span>Status Layanan</span>
+                <span>{t('home.service_status')}</span>
               </h4>
               {healthLoading ? (
                 <div className="health-skeleton">
@@ -172,7 +240,7 @@ function Beranda() {
                           <span className="health-name">{service?.title || status.key}</span>
                           <span className="health-detail">{status.details}</span>
                         </div>
-                        <StatusBadge status={status.status} label={status.label} />
+                        <StatusBadge status={status.status} label={status.status === 'online' ? t('home.status.online') : t('home.status.offline')} />
                       </div>
                     );
                   })}
@@ -182,7 +250,7 @@ function Beranda() {
 
             {/* Recent Announcements widget */}
             <div className="card announcements-widget" aria-label="Pengumuman Terbaru">
-              <h4 className="widget-heading">Pengumuman Terbaru</h4>
+              <h4 className="widget-heading">{t('home.ann.title')}</h4>
               {loading ? (
                 <div className="announcements-skeleton">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -203,7 +271,7 @@ function Beranda() {
                 </div>
               )}
               <Link to="/pengumuman" className="widget-footer-link">
-                <span>Lihat semua pengumuman</span>
+                <span>{t('home.ann.view_all')}</span>
                 <ChevronRight size={14} />
               </Link>
             </div>

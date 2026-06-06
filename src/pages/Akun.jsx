@@ -1,31 +1,33 @@
 // Akun — Account Page
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { UserCircle, Calendar, Mail, Phone, KeyRound, Settings, ChevronRight, ArrowLeft } from 'lucide-react';
+import { UserCircle, Calendar, Mail, ArrowLeft } from 'lucide-react';
 import { useKeycloak } from '../context/KeycloakContext';
+import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import Layout from '../components/Layout';
 import './Akun.css';
 
 const dataSections = [
   {
-    title: 'Informasi Pribadi',
-    subtitle: 'Data diri Anda yang terintegrasi pada sistem SSO S4RAS',
+    titleKey: 'account.personal_info',
+    subtitleKey: 'account.personal_desc',
     items: [
-      { icon: UserCircle, title: 'Nama Lengkap', valueKey: 'name', subtitle: 'Nama lengkap terdaftar' },
-      { icon: Calendar, title: 'Username / ID', valueKey: 'username', subtitle: 'ID unik pengguna' },
+      { icon: UserCircle, titleKey: 'account.fullname', valueKey: 'name', subtitleKey: 'account.fullname_sub' },
+      { icon: Calendar, titleKey: 'account.username', valueKey: 'username', subtitleKey: 'account.username_sub' },
     ],
   },
   {
-    title: 'Hubungan Kontak',
-    subtitle: 'Alamat email aktif untuk notifikasi sistem',
+    titleKey: 'account.contact_info',
+    subtitleKey: 'account.contact_desc',
     items: [
-      { icon: Mail, title: 'Email Utama', valueKey: 'email', subtitle: 'Email aktif untuk autentikasi' },
+      { icon: Mail, titleKey: 'account.email', valueKey: 'email', subtitleKey: 'account.email_sub' },
     ],
   },
 ];
 
 function Akun() {
   const { profile } = useKeycloak();
+  const { t } = useThemeLanguage();
   
   const getFullName = () => {
     if (profile?.firstName) {
@@ -48,7 +50,7 @@ function Akun() {
     return '-';
   };
 
-  const role = profile?.attributes?.role?.[0] || 'Pengguna Portal';
+  const role = profile?.attributes?.role?.[0] || t('account.user_portal');
 
   return (
     <Layout>
@@ -58,9 +60,9 @@ function Akun() {
         <div className="akun-header-nav">
           <Link to="/home" className="back-link">
             <ArrowLeft size={16} />
-            <span>Kembali ke Beranda</span>
+            <span>{t('account.back')}</span>
           </Link>
-          <h2 className="page-title">Informasi Akun</h2>
+          <h2 className="page-title">{t('account.title_info')}</h2>
         </div>
 
         {/* Profile Card Header */}
@@ -79,12 +81,12 @@ function Akun() {
         </div>
 
         {/* Section Cards */}
-        <section className="akun-detail-grid" aria-label="Detail Akun">
+        <section className="akun-detail-grid" aria-label={t('account.title_info')}>
           {dataSections.map((section, idx) => (
             <div className="card detail-section-card" key={idx}>
               <div className="section-card-header">
-                <h4>{section.title}</h4>
-                <p>{section.subtitle}</p>
+                <h4>{t(section.titleKey)}</h4>
+                <p>{t(section.subtitleKey)}</p>
               </div>
 
               <div className="section-card-list">
@@ -97,7 +99,7 @@ function Akun() {
                           <Icon size={18} />
                         </div>
                         <div className="item-details">
-                          <span className="item-label">{item.title}</span>
+                          <span className="item-label">{t(item.titleKey)}</span>
                           <span className="item-value">{getValue(item.valueKey)}</span>
                         </div>
                       </div>

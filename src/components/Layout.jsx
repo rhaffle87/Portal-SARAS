@@ -4,6 +4,8 @@ import { useKeycloak } from '../context/KeycloakContext';
 import { Home, User, Megaphone, Shield, LogOut, Menu, X, Settings, ChevronDown, Globe } from 'lucide-react';
 import './Layout.css';
 
+import { useThemeLanguage } from '../context/ThemeLanguageContext';
+
 const NAV_ITEMS = [
   { to: '/home', label: 'Beranda', icon: Home },
   { to: '/akun', label: 'Akun', icon: User },
@@ -14,10 +16,10 @@ const NAV_ITEMS = [
 
 function Layout({ children }) {
   const { logout, isAdmin, profile } = useKeycloak();
+  const { language, setLanguage, t } = useThemeLanguage();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState('ID');
 
   // Filter items based on role
   const visibleNavItems = NAV_ITEMS.filter((item) => {
@@ -63,11 +65,20 @@ function Layout({ children }) {
     return (profile?.username?.[0] || 'U').toUpperCase();
   };
 
+  const getNavLabel = (path) => {
+    if (path === '/home') return t('nav.home');
+    if (path === '/akun') return t('nav.account');
+    if (path === '/pengumuman') return t('nav.announcements');
+    if (path === '/pengaturan') return t('nav.settings');
+    if (path === '/admin') return t('nav.admin');
+    return '';
+  };
+
   return (
     <>
       {/* Skip-to-content link (a11y) */}
       <a href="#main-content" className="skip-link">
-        Langsung ke konten utama
+        {language === 'en' ? 'Skip to main content' : 'Langsung ke konten utama'}
       </a>
 
       <div className="portal-container">
@@ -93,38 +104,38 @@ function Layout({ children }) {
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
             <h1 className="logo">
-              <span>myS4RAS</span> Portal
+              <span>S4RAS</span> Portal
             </h1>
           </div>
 
           <div className="topbar-actions">
             {/* Language Dropdown */}
             <div className="lang-dropdown-container">
-              <button 
-                className="lang-btn" 
+              <button
+                className="lang-btn"
                 onClick={() => setLangOpen(!langOpen)}
                 aria-expanded={langOpen}
                 aria-haspopup="listbox"
               >
-                <span>{currentLang}</span>
+                <span>{language.toUpperCase()}</span>
                 <ChevronDown size={14} />
               </button>
 
               {langOpen && (
                 <ul className="lang-menu" role="listbox">
-                  <li 
-                    className={currentLang === 'ID' ? 'active' : ''}
-                    onClick={() => { setCurrentLang('ID'); setLangOpen(false); }}
+                  <li
+                    className={language === 'id' ? 'active' : ''}
+                    onClick={() => { setLanguage('id'); setLangOpen(false); }}
                     role="option"
-                    aria-selected={currentLang === 'ID'}
+                    aria-selected={language === 'id'}
                   >
                     ID (Bahasa)
                   </li>
-                  <li 
-                    className={currentLang === 'EN' ? 'active' : ''}
-                    onClick={() => { setCurrentLang('EN'); setLangOpen(false); }}
+                  <li
+                    className={language === 'en' ? 'active' : ''}
+                    onClick={() => { setLanguage('en'); setLangOpen(false); }}
                     role="option"
-                    aria-selected={currentLang === 'EN'}
+                    aria-selected={language === 'en'}
                   >
                     EN (English)
                   </li>
@@ -150,7 +161,7 @@ function Layout({ children }) {
             aria-label="Navigasi utama"
           >
             <nav className="sidebar-menu">
-              {visibleNavItems.map(({ to, label, icon: Icon }) => (
+              {visibleNavItems.map(({ to, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -160,7 +171,7 @@ function Layout({ children }) {
                   aria-current={location.pathname === to ? 'page' : undefined}
                 >
                   <Icon size={18} aria-hidden="true" />
-                  <span>{label}</span>
+                  <span>{getNavLabel(to)}</span>
                 </NavLink>
               ))}
             </nav>
@@ -171,7 +182,7 @@ function Layout({ children }) {
               aria-label="Keluar dari akun"
             >
               <LogOut size={18} aria-hidden="true" />
-              <span>Logout</span>
+              <span>{t('nav.logout')}</span>
             </button>
           </aside>
 

@@ -4,14 +4,15 @@ import { Link } from 'react-router-dom';
 import { Search, ArrowLeft, Bell, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
-import SkeletonCard from '../components/SkeletonCard';
 import './Pengumuman.css';
 import { fetchAnnouncements } from '../services/backend';
+import { useThemeLanguage } from '../context/ThemeLanguageContext';
 
 function Pengumuman() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useThemeLanguage();
 
   useEffect(() => {
     let active = true;
@@ -66,18 +67,18 @@ function Pengumuman() {
         <div className="page-header-nav">
           <Link to="/home" className="back-link">
             <ArrowLeft size={16} />
-            <span>Kembali ke Beranda</span>
+            <span>{t('ann.back')}</span>
           </Link>
           
           <div className="header-search-row">
-            <h2 className="page-title">Daftar Pengumuman</h2>
+            <h2 className="page-title">{t('ann.title')}</h2>
             
             {/* Search Input Bar */}
             <div className="search-bar">
               <Search size={18} className="search-icon" />
               <input
                 type="text"
-                placeholder="Cari pengumuman..."
+                placeholder={t('ann.search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input glass-input"
@@ -92,7 +93,7 @@ function Pengumuman() {
         </div>
 
         {loading ? (
-          <div className="pengumuman-grid" aria-busy="true" aria-label="Memuat pengumuman">
+          <div className="pengumuman-grid" aria-busy="true" aria-label={t('ann.loading')}>
             {Array.from({ length: 6 }).map((_, i) => (
               <div className="card pengumuman-skeleton-card" key={i}>
                 <div className="skeleton" style={{ width: 32, height: 32, borderRadius: '50%' }} />
@@ -108,7 +109,7 @@ function Pengumuman() {
             {filteredAnnouncements.length === 0 ? (
               <div className="card empty-state">
                 <Bell size={40} className="empty-state-icon" />
-                <p>Tidak ada pengumuman yang cocok dengan pencarian Anda.</p>
+                <p>{t('ann.no_results')}</p>
               </div>
             ) : (
               <motion.div 
@@ -117,7 +118,7 @@ function Pengumuman() {
                 initial="hidden"
                 animate="show"
                 role="list" 
-                aria-label="Daftar pengumuman"
+                aria-label={t('ann.title')}
               >
                 <AnimatePresence mode="popLayout">
                   {filteredAnnouncements.map((item, index) => (

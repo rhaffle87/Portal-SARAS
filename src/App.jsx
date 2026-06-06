@@ -14,6 +14,8 @@ import Pengumuman from './pages/Pengumuman';
 import Admin from './pages/Admin';
 import Pengaturan from './pages/Pengaturan';
 
+import { ThemeLanguageProvider } from './context/ThemeLanguageContext';
+
 const Page = ({ children }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
@@ -33,7 +35,7 @@ const AppRoutes = () => {
 
   if (!initialized) {
     return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a0c10', color: '#fff' }}>
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-neutral-bg1)', color: '#fff' }}>
         Loading...
       </div>
     );
@@ -41,7 +43,7 @@ const AppRoutes = () => {
 
   if (!authenticated) {
     return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a0c10', color: '#fff' }}>
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-neutral-bg1)', color: '#fff' }}>
         Redirecting to login...
       </div>
     );
@@ -65,9 +67,11 @@ const AppRoutes = () => {
 function App() {
   return (
     <KeycloakProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <ThemeLanguageProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </ThemeLanguageProvider>
     </KeycloakProvider>
   );
 }
