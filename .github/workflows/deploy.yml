@@ -43,18 +43,40 @@ jobs:
           name: build
           path: build
 
-      - name: Prepare SSH key
+      - name: Prepare SSH key and config
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          # Write the private key, handling potential Windows line endings
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts || true
+          
+          # Add host to known_hosts with fallback
+          ssh-keyscan -t rsa -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
+            ssh-keyscan -t rsa "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
+            echo "Warning: ssh-keyscan failed; proceeding with StrictHostKeyChecking=no"
+          
+          # Create SSH config for this host
+          cat > ~/.ssh/config << EOF
+          Host target-server
+            HostName ${{ secrets.SSH_HOST }}
+            Port ${{ secrets.SSH_PORT }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking accept-new
+            UserKnownHostsFile ~/.ssh/known_hosts
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Test SSH connection
+        run: |
+          ssh -v target-server "echo 'SSH connection successful'" || exit 1
 
       - name: Copy build to remote server
         run: |
-          scp -r -P "${{ secrets.SSH_PORT }}" build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_TARGET_PATH }}"
+          scp -r -P "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_rsa -o ConnectTimeout=10 \
+            build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_TARGET_PATH }}"
 
       - name: Restart PM2 on remote server
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "cd ${SSH_TARGET_PATH:-${{ secrets.SSH_TARGET_PATH }}} && pm2 restart portal-prod || pm2 start serve --name portal-prod -- -s build -l 3000"
+          ssh -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_rsa "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "cd ${{ secrets.SSH_TARGET_PATH }} && pm2 restart portal-prod || pm2 start serve --name portal-prod -- -s build -l 3000"
