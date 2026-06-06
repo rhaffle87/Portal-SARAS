@@ -42,7 +42,7 @@ const services = [
   },
   {
     key: 'monitor',
-    title: 'Grafana',
+    title: 'Monitoring',
     description: 'Dashboard monitoring untuk infrastruktur S4RAS.',
     icon: '📊',
     url: 'https://monitor.s4ras.site',

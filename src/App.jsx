@@ -3,45 +3,71 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate
+  Navigate,
+  useLocation
 } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { KeycloakProvider, useKeycloak } from './context/KeycloakContext';
 import Beranda from './pages/Beranda';
 import Akun from './pages/Akun';
 import Pengumuman from './pages/Pengumuman';
 import Admin from './pages/Admin';
+import Pengaturan from './pages/Pengaturan';
+
+const Page = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -12 }}
+    transition={{ duration: 0.2, ease: 'easeOut' }}
+  >
+    {children}
+  </motion.div>
+);
 
 const AppRoutes = () => {
-  const { authenticated, initialized } = useKeycloak();
+  const { authenticated, initialized, isAdmin } = useKeycloak();
+  const location = useLocation();
 
-  console.log('authenticated =', authenticated, 'initialized =', initialized);
+  console.log('authenticated =', authenticated, 'initialized =', initialized, 'isAdmin =', isAdmin);
 
   if (!initialized) {
-    return <div>Loading...</div>; // Tunggu sampai Keycloak selesai melakukan inisialisasi
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a0c10', color: '#fff' }}>
+        Loading...
+      </div>
+    );
   }
 
   if (!authenticated) {
-    return <div>Redirecting to login...</div>;  // Setelah inisialisasi, jika belum autentikasi
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a0c10', color: '#fff' }}>
+        Redirecting to login...
+      </div>
+    );
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/home" element={<Beranda />} />
-        <Route path="/akun" element={<Akun />} />
-        <Route path="/pengumuman" element={<Pengumuman />} />
-        <Route path="/admin" element={<Admin />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/home" element={<Page><Beranda /></Page>} />
+        <Route path="/akun" element={<Page><Akun /></Page>} />
+        <Route path="/pengumuman" element={<Page><Pengumuman /></Page>} />
+        <Route path="/pengaturan" element={<Page><Pengaturan /></Page>} />
+        <Route path="/admin" element={isAdmin ? <Page><Admin /></Page> : <Navigate to="/home" replace />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
-    </Router>
+    </AnimatePresence>
   );
 };
 
 function App() {
   return (
     <KeycloakProvider>
-      <AppRoutes />
+      <Router>
+        <AppRoutes />
+      </Router>
     </KeycloakProvider>
   );
 }

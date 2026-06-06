@@ -1,36 +1,46 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useKeycloak } from '../context/KeycloakContext';
-import { Home, User, Megaphone, Shield, LogOut, Menu, X } from 'lucide-react';
+import { Home, User, Megaphone, Shield, LogOut, Menu, X, Settings, ChevronDown, Globe } from 'lucide-react';
 import './Layout.css';
 
 const NAV_ITEMS = [
   { to: '/home', label: 'Beranda', icon: Home },
   { to: '/akun', label: 'Akun', icon: User },
   { to: '/pengumuman', label: 'Pengumuman', icon: Megaphone },
+  { to: '/pengaturan', label: 'Pengaturan Web', icon: Settings },
   { to: '/admin', label: 'Admin', icon: Shield },
 ];
 
 function Layout({ children }) {
-  const { logout } = useKeycloak();
+  const { logout, isAdmin, profile } = useKeycloak();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState('ID');
+
+  // Filter items based on role
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (item.to === '/admin') return !!isAdmin;
+    return true;
+  });
 
   // Close mobile sidebar on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  // Close on Escape key
+  // Close modals on Escape key
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && mobileOpen) {
-        setMobileOpen(false);
+      if (e.key === 'Escape') {
+        if (mobileOpen) setMobileOpen(false);
+        if (langOpen) setLangOpen(false);
       }
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [mobileOpen]);
+  }, [mobileOpen, langOpen]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -45,6 +55,13 @@ function Layout({ children }) {
   const toggleMobile = useCallback(() => {
     setMobileOpen((prev) => !prev);
   }, []);
+
+  const getInitials = () => {
+    if (profile?.firstName) {
+      return (profile.firstName[0] + (profile.lastName?.[0] || '')).toUpperCase();
+    }
+    return (profile?.username?.[0] || 'U').toUpperCase();
+  };
 
   return (
     <>
@@ -63,61 +80,106 @@ function Layout({ children }) {
           />
         )}
 
-        {/* Mobile header bar */}
-        <header className="mobile-header">
-          <button
-            className="mobile-toggle"
-            onClick={toggleMobile}
-            aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
-            aria-expanded={mobileOpen}
-            aria-controls="sidebar-nav"
-          >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-          <h1 className="mobile-logo"><span>S4RAS</span> Portal</h1>
-        </header>
-
-        {/* Sidebar */}
-        <aside
-          id="sidebar-nav"
-          className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`}
-          role="navigation"
-          aria-label="Navigasi utama"
-        >
-          <div className="sidebar-header">
-            <h1 className="logo"><span>S4RAS</span> Portal</h1>
+        {/* Global Top Bar */}
+        <header className="portal-topbar">
+          <div className="topbar-logo-section">
+            <button
+              className="mobile-toggle"
+              onClick={toggleMobile}
+              aria-label={mobileOpen ? 'Tutup menu' : 'Buka menu'}
+              aria-expanded={mobileOpen}
+              aria-controls="sidebar-nav"
+            >
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+            <h1 className="logo">
+              <span>myS4RAS</span> Portal
+            </h1>
           </div>
 
-          <nav className="sidebar-menu">
-            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  `menu-item ${isActive ? 'menu-item--active' : ''}`
-                }
-                aria-current={location.pathname === to ? 'page' : undefined}
+          <div className="topbar-actions">
+            {/* Language Dropdown */}
+            <div className="lang-dropdown-container">
+              <button 
+                className="lang-btn" 
+                onClick={() => setLangOpen(!langOpen)}
+                aria-expanded={langOpen}
+                aria-haspopup="listbox"
               >
-                <Icon size={20} aria-hidden="true" />
-                <span>{label}</span>
-              </NavLink>
-            ))}
-          </nav>
+                <span>{currentLang}</span>
+                <ChevronDown size={14} />
+              </button>
 
-          <button
-            className="menu-item menu-item--logout"
-            onClick={logout}
-            aria-label="Keluar dari akun"
+              {langOpen && (
+                <ul className="lang-menu" role="listbox">
+                  <li 
+                    className={currentLang === 'ID' ? 'active' : ''}
+                    onClick={() => { setCurrentLang('ID'); setLangOpen(false); }}
+                    role="option"
+                    aria-selected={currentLang === 'ID'}
+                  >
+                    ID (Bahasa)
+                  </li>
+                  <li 
+                    className={currentLang === 'EN' ? 'active' : ''}
+                    onClick={() => { setCurrentLang('EN'); setLangOpen(false); }}
+                    role="option"
+                    aria-selected={currentLang === 'EN'}
+                  >
+                    EN (English)
+                  </li>
+                </ul>
+              )}
+            </div>
+
+            {/* Profile Avatar Widget */}
+            <div className="topbar-profile" title={profile?.email}>
+              <div className="avatar-circle">
+                {getInitials()}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="portal-body">
+          {/* Sidebar */}
+          <aside
+            id="sidebar-nav"
+            className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`}
+            role="navigation"
+            aria-label="Navigasi utama"
           >
-            <LogOut size={20} aria-hidden="true" />
-            <span>Logout</span>
-          </button>
-        </aside>
+            <nav className="sidebar-menu">
+              {visibleNavItems.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    `menu-item ${isActive ? 'menu-item--active' : ''}`
+                  }
+                  aria-current={location.pathname === to ? 'page' : undefined}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </nav>
 
-        {/* Main content */}
-        <main id="main-content" className="main-content" tabIndex={-1}>
-          {children}
-        </main>
+            <button
+              className="menu-item menu-item--logout"
+              onClick={logout}
+              aria-label="Keluar dari akun"
+            >
+              <LogOut size={18} aria-hidden="true" />
+              <span>Logout</span>
+            </button>
+          </aside>
+
+          {/* Main content */}
+          <main id="main-content" className="main-content" tabIndex={-1}>
+            {children}
+          </main>
+        </div>
       </div>
     </>
   );

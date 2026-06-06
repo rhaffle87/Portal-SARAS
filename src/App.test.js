@@ -9,10 +9,12 @@ vi.mock('./context/KeycloakContext', () => ({
   useKeycloak: () => ({
     authenticated: true,
     initialized: true,
+    isAdmin: false,
     profile: {
       username: 'ci-user',
       email: 'ci-user@example.com'
-    }
+    },
+    logout: vi.fn()
   })
 }));
 

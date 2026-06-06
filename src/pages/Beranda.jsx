@@ -1,7 +1,8 @@
 // Beranda — Home Dashboard
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ChevronRight, Calendar, ArrowDown } from 'lucide-react';
+import { ExternalLink, ChevronRight, Calendar, ArrowDown, User, Activity, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 import './Beranda.css';
 import Layout from '../components/Layout';
 import SkeletonCard from '../components/SkeletonCard';
@@ -43,122 +44,170 @@ function Beranda() {
     return () => { mounted = false; };
   }, []);
 
-  const username = profile?.username || profile?.email || 'Pengguna S4RAS';
+  const getGreeting = () => {
+    const hr = today.getHours();
+    if (hr < 11) return 'Selamat pagi';
+    if (hr < 15) return 'Selamat siang';
+    if (hr < 19) return 'Selamat sore';
+    return 'Selamat malam';
+  };
+
+  const username = profile?.firstName 
+    ? `${profile.firstName} ${profile.lastName || ''}`.trim()
+    : profile?.username || profile?.email || 'Pengguna S4RAS';
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0 }
+  };
 
   return (
     <Layout>
-      <div className="home-layout">
-        {/* Left Column — Services Grid */}
-        <div className="left-column">
-          <section className="card apps-section" aria-label="Aplikasi dan Layanan">
-            <h2>Aplikasi dan Layanan</h2>
-            <div className="apps-grid">
-              {services.map((service) => (
-                <a
-                  key={service.key}
-                  href={service.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="app-card"
-                  aria-label={`${service.title} — ${service.description}`}
-                >
-                  <div className="app-icon-wrapper">
-                    <span className="app-icon-emoji" aria-hidden="true">{service.icon}</span>
-                  </div>
-                  <div className="app-info">
-                    <div className="app-name">{service.title}</div>
-                    <div className="app-desc">{service.description}</div>
-                  </div>
-                  <ExternalLink size={16} className="app-external" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-            <Link to="/pengumuman" className="show-all-btn">
-              <ArrowDown size={16} aria-hidden="true" />
-              Lihat Pengumuman
-            </Link>
-          </section>
-        </div>
+      <div className="dashboard-container">
+        
+        {/* Welcome Hero Banner */}
+        <section className="welcome-banner card" aria-label="Selamat Datang">
+          <div className="welcome-banner-content">
+            <h2 className="welcome-title">{getGreeting()}, {username}!</h2>
+            <p className="welcome-subtitle">
+              Hari ini adalah <strong>{formattedDate}</strong>. Anda login menggunakan Single Sign-On (SSO) Portal S4RAS.
+            </p>
+          </div>
+        </section>
 
-        {/* Right Column — Profile, Date, Health, Announcements */}
-        <div className="right-column">
-          {/* Profile Card */}
-          <div className="card profile-card">
-            <div className="profile-avatar" aria-hidden="true">
-              {(username[0] || 'U').toUpperCase()}
+        <div className="home-layout">
+          {/* Left Column — Application launcher grid */}
+          <div className="left-column">
+            <section className="card apps-section" aria-label="Aplikasi dan Layanan">
+              <h3 className="section-title">Aplikasi dan Layanan</h3>
+              <motion.div 
+                className="apps-grid"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+              >
+                {services.map((service) => (
+                  <motion.a
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.02, translateY: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    key={service.key}
+                    href={service.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="app-card"
+                    aria-label={`${service.title} — ${service.description}`}
+                  >
+                    <div className="app-icon-wrapper">
+                      <span className="app-icon-emoji" aria-hidden="true">{service.icon}</span>
+                    </div>
+                    <div className="app-info">
+                      <div className="app-name">{service.title}</div>
+                      <div className="app-desc">{service.description}</div>
+                    </div>
+                    <ExternalLink size={14} className="app-external" aria-hidden="true" />
+                  </motion.a>
+                ))}
+              </motion.div>
+            </section>
+
+            {/* Quick Informational Notice */}
+            <div className="card notice-banner">
+              <AlertCircle size={18} className="notice-icon" />
+              <div className="notice-text">
+                Butuh bantuan login atau integrasi SSO? Kunjungi halaman <Link to="/pengaturan">Pengaturan Web</Link> atau hubungi admin portal.
+              </div>
             </div>
-            <div className="profile-info">
-              <div className="profile-name">{username}</div>
-              <div className="profile-email">{profile?.email || 'email@domain.com'}</div>
-              <Link to="/akun" className="manage-account-link">
-                Kelola Akun
-                <ChevronRight size={14} aria-hidden="true" />
+          </div>
+
+          {/* Right Column — User widget and services status */}
+          <div className="right-column">
+            {/* Quick Profile widget */}
+            <div className="card profile-widget">
+              <div className="profile-widget-header">
+                <div className="widget-avatar">
+                  <User size={24} />
+                </div>
+                <div className="widget-info">
+                  <h4 className="widget-name">{username}</h4>
+                  <p className="widget-email">{profile?.email || 'email@domain.com'}</p>
+                </div>
+              </div>
+              <Link to="/akun" className="widget-action-btn">
+                <span>Kelola Profil Akun</span>
+                <ChevronRight size={16} />
               </Link>
             </div>
-          </div>
 
-          {/* Date Card */}
-          <div className="card date-card" aria-label={`Hari ini: ${formattedDate}`}>
-            <Calendar size={20} aria-hidden="true" />
-            <div>
-              <div className="day">{weekday}</div>
-              <div className="full-date">{formattedDate}</div>
-            </div>
-          </div>
-
-          {/* Health Card */}
-          <div className="card health-card" aria-label="Status layanan">
-            <h3>Status Layanan</h3>
-            {healthLoading ? (
-              <div className="health-skeleton">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <SkeletonCard key={i} lines={1} />
-                ))}
-              </div>
-            ) : (
-              <div className="health-list">
-                {healthStatuses.map((status) => {
-                  const service = services.find((s) => s.key === status.key);
-                  return (
-                    <div className="health-row" key={status.key}>
-                      <div>
-                        <div className="health-name">{service?.title || status.key}</div>
-                        <div className="health-detail">{status.details}</div>
+            {/* Health Checklist Status */}
+            <div className="card health-card" aria-label="Status Layanan">
+              <h4 className="widget-heading">
+                <Activity size={16} />
+                <span>Status Layanan</span>
+              </h4>
+              {healthLoading ? (
+                <div className="health-skeleton">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <SkeletonCard key={i} lines={1} />
+                  ))}
+                </div>
+              ) : (
+                <div className="health-list">
+                  {healthStatuses.map((status) => {
+                    const service = services.find((s) => s.key === status.key);
+                    return (
+                      <div className="health-row" key={status.key}>
+                        <div className="health-meta">
+                          <span className="health-name">{service?.title || status.key}</span>
+                          <span className="health-detail">{status.details}</span>
+                        </div>
+                        <StatusBadge status={status.status} label={status.label} />
                       </div>
-                      <StatusBadge status={status.status} label={status.label} />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-          {/* Announcements Card */}
-          <div className="card announcements-card" aria-label="Pengumuman terbaru">
-            <h3>Pengumuman</h3>
-            {loading ? (
-              <div className="announcements-skeleton">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <SkeletonCard key={i} lines={2} showIcon />
-                ))}
-              </div>
-            ) : (
-              <div className="announcements-list">
-                {announcements.map((item, index) => (
-                  <div className="announcement-mini" key={index}>
-                    <div className="announcement-dot" aria-hidden="true" />
-                    <div>
-                      <div className="announcement-title-mini">{item.title}</div>
-                      <div className="announcement-desc-mini">{item.description || item.desc}</div>
+            {/* Recent Announcements widget */}
+            <div className="card announcements-widget" aria-label="Pengumuman Terbaru">
+              <h4 className="widget-heading">Pengumuman Terbaru</h4>
+              {loading ? (
+                <div className="announcements-skeleton">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonCard key={i} lines={2} showIcon />
+                  ))}
+                </div>
+              ) : (
+                <div className="announcements-list">
+                  {announcements.slice(0, 3).map((item, index) => (
+                    <div className="announcement-mini" key={index}>
+                      <div className="announcement-dot" aria-hidden="true" />
+                      <div className="announcement-mini-content">
+                        <div className="announcement-title-mini">{item.title}</div>
+                        <div className="announcement-desc-mini">{item.description || item.desc}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <Link to="/pengumuman" className="view-all-link">
-              Lihat Semua Pengumuman
-              <ChevronRight size={14} aria-hidden="true" />
-            </Link>
+                  ))}
+                </div>
+              )}
+              <Link to="/pengumuman" className="widget-footer-link">
+                <span>Lihat semua pengumuman</span>
+                <ChevronRight size={14} />
+              </Link>
+            </div>
+
           </div>
         </div>
       </div>

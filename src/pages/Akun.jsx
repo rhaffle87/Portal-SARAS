@@ -8,90 +8,107 @@ import './Akun.css';
 
 const dataSections = [
   {
-    title: 'Informasi pribadi',
-    subtitle: 'Data yang umumnya ditampilkan di semua layanan S4RAS',
+    title: 'Informasi Pribadi',
+    subtitle: 'Data diri Anda yang terintegrasi pada sistem SSO S4RAS',
     items: [
-      { icon: UserCircle, title: 'Nama', subtitle: 'Perbarui nama lengkap dan nama panggilan' },
-      { icon: Calendar, title: 'Tanggal Lahir', subtitle: 'Perbarui tanggal lahir' },
+      { icon: UserCircle, title: 'Nama Lengkap', valueKey: 'name', subtitle: 'Nama lengkap terdaftar' },
+      { icon: Calendar, title: 'Username / ID', valueKey: 'username', subtitle: 'ID unik pengguna' },
     ],
   },
   {
-    title: 'Kontak',
-    subtitle: 'Ubah email dan nomor ponsel',
+    title: 'Hubungan Kontak',
+    subtitle: 'Alamat email aktif untuk notifikasi sistem',
     items: [
-      { icon: Mail, title: 'Email', subtitle: 'Perbarui dan verifikasi email' },
-      { icon: Phone, title: 'Nomor Ponsel', subtitle: 'Perbarui dan verifikasi nomor telepon' },
-    ],
-  },
-  {
-    title: 'Lainnya',
-    subtitle: 'Kata sandi dan preferensi tampilan',
-    items: [
-      { icon: KeyRound, title: 'Keamanan Akun', subtitle: 'Atur kata sandi atau MFA' },
-      { icon: Settings, title: 'Preferensi', subtitle: 'Sesuaikan tampilan dan preferensi Anda' },
+      { icon: Mail, title: 'Email Utama', valueKey: 'email', subtitle: 'Email aktif untuk autentikasi' },
     ],
   },
 ];
 
 function Akun() {
   const { profile } = useKeycloak();
-  const fullName = profile?.firstName || profile?.username || 'Pengguna S4RAS';
-  const email = profile?.email || 'email@domain.com';
-  const role = profile?.attributes?.role?.[0] || 'Anggota';
+  
+  const getFullName = () => {
+    if (profile?.firstName) {
+      return `${profile.firstName} ${profile.lastName || ''}`.trim();
+    }
+    return profile?.username || 'Pengguna S4RAS';
+  };
+
+  const getInitials = () => {
+    if (profile?.firstName) {
+      return (profile.firstName[0] + (profile.lastName?.[0] || '')).toUpperCase();
+    }
+    return (profile?.username?.[0] || 'U').toUpperCase();
+  };
+
+  const getValue = (key) => {
+    if (key === 'name') return getFullName();
+    if (key === 'username') return profile?.username || '-';
+    if (key === 'email') return profile?.email || '-';
+    return '-';
+  };
+
+  const role = profile?.attributes?.role?.[0] || 'Pengguna Portal';
 
   return (
     <Layout>
-      {/* Profile Header */}
-      <div className="akun-profile-card card">
-        <div className="akun-avatar" aria-hidden="true">
-          {(fullName[0] || 'U').toUpperCase()}
+      <div className="akun-container">
+        
+        {/* Back Link Header */}
+        <div className="akun-header-nav">
+          <Link to="/home" className="back-link">
+            <ArrowLeft size={16} />
+            <span>Kembali ke Beranda</span>
+          </Link>
+          <h2 className="page-title">Informasi Akun</h2>
         </div>
-        <div className="akun-info">
-          <h2 className="akun-name">{fullName}</h2>
-          <div className="akun-email">{email}</div>
-          <span className="akun-role-badge">{role}</span>
-        </div>
-      </div>
 
-      {/* Settings Sections */}
-      <section className="akun-sections" aria-label="Pengaturan akun">
-        {dataSections.map((section, index) => (
-          <div className="card akun-section" key={index}>
-            <div className="akun-section-header">
-              <h3>{section.title}</h3>
-              <p className="akun-section-subtitle">{section.subtitle}</p>
+        {/* Profile Card Header */}
+        <div className="akun-profile-hero card">
+          <div className="akun-hero-avatar-wrapper">
+            <div className="akun-avatar-circle">
+              {getInitials()}
             </div>
-            {section.items.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  className="akun-item"
-                  key={idx}
-                  type="button"
-                  aria-label={`${item.title}: ${item.subtitle}`}
-                >
-                  <div className="akun-item-left">
-                    <div className="akun-item-icon">
-                      <Icon size={18} aria-hidden="true" />
-                    </div>
-                    <div className="akun-item-text">
-                      <div className="akun-item-title">{item.title}</div>
-                      <div className="akun-item-subtitle">{item.subtitle}</div>
-                    </div>
-                  </div>
-                  <ChevronRight size={18} className="akun-item-arrow" aria-hidden="true" />
-                </button>
-              );
-            })}
+            <span className="akun-badge">{role}</span>
           </div>
-        ))}
-      </section>
+          
+          <div className="akun-hero-info">
+            <h3 className="akun-hero-name">{getFullName()}</h3>
+            <p className="akun-hero-email">{profile?.email || 'email@domain.com'}</p>
+          </div>
+        </div>
 
-      <div className="actions-row">
-        <Link to="/home" className="action-button">
-          <ArrowLeft size={16} aria-hidden="true" />
-          Kembali ke Beranda
-        </Link>
+        {/* Section Cards */}
+        <section className="akun-detail-grid" aria-label="Detail Akun">
+          {dataSections.map((section, idx) => (
+            <div className="card detail-section-card" key={idx}>
+              <div className="section-card-header">
+                <h4>{section.title}</h4>
+                <p>{section.subtitle}</p>
+              </div>
+
+              <div className="section-card-list">
+                {section.items.map((item, itemIdx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div className="section-list-item" key={itemIdx}>
+                      <div className="item-left">
+                        <div className="item-icon-box">
+                          <Icon size={18} />
+                        </div>
+                        <div className="item-details">
+                          <span className="item-label">{item.title}</span>
+                          <span className="item-value">{getValue(item.valueKey)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </section>
+
       </div>
     </Layout>
   );

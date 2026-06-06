@@ -15,7 +15,7 @@ export const fetchAnnouncements = async () => {
       },
       {
         title: 'Aplikasi terhubung',
-        description: 'Portal, Moodle, Nextcloud, dan Grafana bisa diakses melalui reverse proxy.',
+        description: 'Portal, Moodle, Nextcloud, dan Monitoring bisa diakses melalui reverse proxy.',
         badge: 'Sistem'
       }
     ];
@@ -40,42 +40,48 @@ export const fetchAnnouncements = async () => {
   }
 };
 
+const getTimeoutSignal = (ms) => {
+  if (typeof AbortSignal.timeout === 'function') {
+    return AbortSignal.timeout(ms);
+  }
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+};
+
 export const checkServiceHealth = async (service) => {
+  // 1. Try backend API health check first if base URL is set
   if (BACKEND_API_BASE) {
     try {
       const res = await fetch(`${BACKEND_API_BASE}/health/${service.key}`, {
         cache: 'no-store',
+        signal: getTimeoutSignal(5000),
       });
-      if (!res.ok) {
-        return {
-          key: service.key,
-          status: 'offline',
-          label: `Offline (${res.status})`,
-          details: service.url,
-        };
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        const statusStr = (data?.status || '').toLowerCase();
+        if (statusStr === 'online' || statusStr === 'ok' || statusStr === 'up') {
+          return {
+            key: service.key,
+            status: 'online',
+            label: data?.status || 'Online',
+            details: data?.message || service.url,
+          };
+        }
       }
-      const data = await res.json().catch(() => null);
-      return {
-        key: service.key,
-        status: 'online',
-        label: data?.status || 'Online',
-        details: data?.message || service.url,
-      };
     } catch (error) {
-      return {
-        key: service.key,
-        status: 'offline',
-        label: 'Offline',
-        details: error.message || service.url,
-      };
+      console.warn(`Backend health check failed for ${service.key}, falling back to browser check.`, error);
     }
   }
 
+  // 2. Client-side browser fallback check (direct fetch)
   try {
+    // Try GET with mode: 'no-cors' since some web servers/gateways reject HEAD requests
     await fetch(service.url, {
-      method: 'HEAD',
+      method: 'GET',
       mode: 'no-cors',
       cache: 'no-store',
+      signal: getTimeoutSignal(5000),
     });
     return {
       key: service.key,
@@ -83,12 +89,32 @@ export const checkServiceHealth = async (service) => {
       label: 'Online',
       details: service.url,
     };
-  } catch (error) {
+  } catch (publicError) {
+    // 3. Special Local Fallback: If running on HTTP (e.g., localhost), try the internal URL directly
+    if (window.location.protocol === 'http:' && service.internalUrl) {
+      try {
+        await fetch(service.internalUrl, {
+          method: 'GET',
+          mode: 'no-cors',
+          cache: 'no-store',
+          signal: getTimeoutSignal(3000),
+        });
+        return {
+          key: service.key,
+          status: 'online',
+          label: 'Online (Lokal)',
+          details: service.internalUrl,
+        };
+      } catch (internalError) {
+        // Fall through
+      }
+    }
+
     return {
       key: service.key,
       status: 'offline',
       label: 'Offline',
-      details: error.message,
+      details: publicError.message || 'Koneksi gagal',
     };
   }
 };
