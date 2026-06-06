@@ -1,6 +1,7 @@
-// AccountPage.jsx
+// Akun — Account Page
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { UserCircle, Calendar, Mail, Phone, KeyRound, Settings, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useKeycloak } from '../context/KeycloakContext';
 import Layout from '../components/Layout';
 import './Akun.css';
@@ -8,26 +9,26 @@ import './Akun.css';
 const dataSections = [
   {
     title: 'Informasi pribadi',
-    subtitle: 'Data yang umumnya ditampilkan di semua web myITS',
+    subtitle: 'Data yang umumnya ditampilkan di semua layanan S4RAS',
     items: [
-      { icon: '🅰️', title: 'Nama', subtitle: 'Perbarui nama lengkap dan nama panggilan' },
-      { icon: '📅', title: 'Tanggal Lahir', subtitle: 'Perbarui tanggal lahir' },
+      { icon: UserCircle, title: 'Nama', subtitle: 'Perbarui nama lengkap dan nama panggilan' },
+      { icon: Calendar, title: 'Tanggal Lahir', subtitle: 'Perbarui tanggal lahir' },
     ],
   },
   {
     title: 'Kontak',
     subtitle: 'Ubah email dan nomor ponsel',
     items: [
-      { icon: '✉️', title: 'Email', subtitle: 'Perbarui dan verifikasi email' },
-      { icon: '📞', title: 'Nomor Ponsel', subtitle: 'Perbarui dan verifikasi nomor telepon' },
+      { icon: Mail, title: 'Email', subtitle: 'Perbarui dan verifikasi email' },
+      { icon: Phone, title: 'Nomor Ponsel', subtitle: 'Perbarui dan verifikasi nomor telepon' },
     ],
   },
   {
     title: 'Lainnya',
     subtitle: 'Kata sandi dan preferensi tampilan',
     items: [
-      { icon: '🔑', title: 'Keamanan Akun', subtitle: 'Atur kata sandi atau MFA' },
-      { icon: '⚙️', title: 'Preferensi', subtitle: 'Sesuaikan tampilan dan preferensi Anda' },
+      { icon: KeyRound, title: 'Keamanan Akun', subtitle: 'Atur kata sandi atau MFA' },
+      { icon: Settings, title: 'Preferensi', subtitle: 'Sesuaikan tampilan dan preferensi Anda' },
     ],
   },
 ];
@@ -40,43 +41,57 @@ function Akun() {
 
   return (
     <Layout>
-      <div className="profile-panel">
-        <div className="profile-card">
-          <div className="profile-pic">
-            <div className="profile-icon">👤</div>
-          </div>
-          <div className="profile-info">
-            <div className="profile-name">{fullName}</div>
-            <div className="profile-email">{email}</div>
-            <div className="profile-role">{role}</div>
-          </div>
+      {/* Profile Header */}
+      <div className="akun-profile-card card">
+        <div className="akun-avatar" aria-hidden="true">
+          {(fullName[0] || 'U').toUpperCase()}
+        </div>
+        <div className="akun-info">
+          <h2 className="akun-name">{fullName}</h2>
+          <div className="akun-email">{email}</div>
+          <span className="akun-role-badge">{role}</span>
         </div>
       </div>
 
-      <section className="account-sections">
+      {/* Settings Sections */}
+      <section className="akun-sections" aria-label="Pengaturan akun">
         {dataSections.map((section, index) => (
-          <div className="section" key={index}>
-            <h3>{section.title}</h3>
-            <p className="section-subtitle">{section.subtitle}</p>
-            {section.items.map((item, idx) => (
-              <div className="section-item" key={idx}>
-                <div className="item-left">
-                  <div className="item-icon">{item.icon}</div>
-                  <div className="item-text">
-                    <div className="item-title">{item.title}</div>
-                    <div className="item-subtitle">{item.subtitle}</div>
+          <div className="card akun-section" key={index}>
+            <div className="akun-section-header">
+              <h3>{section.title}</h3>
+              <p className="akun-section-subtitle">{section.subtitle}</p>
+            </div>
+            {section.items.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  className="akun-item"
+                  key={idx}
+                  type="button"
+                  aria-label={`${item.title}: ${item.subtitle}`}
+                >
+                  <div className="akun-item-left">
+                    <div className="akun-item-icon">
+                      <Icon size={18} aria-hidden="true" />
+                    </div>
+                    <div className="akun-item-text">
+                      <div className="akun-item-title">{item.title}</div>
+                      <div className="akun-item-subtitle">{item.subtitle}</div>
+                    </div>
                   </div>
-                </div>
-                <div className="item-arrow">›</div>
-              </div>
-            ))}
+                  <ChevronRight size={18} className="akun-item-arrow" aria-hidden="true" />
+                </button>
+              );
+            })}
           </div>
         ))}
       </section>
 
       <div className="actions-row">
-        <Link to="/home" className="action-button">Kembali ke Beranda</Link>
-        <Link to="/pengumuman" className="action-button">Lihat Pengumuman</Link>
+        <Link to="/home" className="action-button">
+          <ArrowLeft size={16} aria-hidden="true" />
+          Kembali ke Beranda
+        </Link>
       </div>
     </Layout>
   );

@@ -1,5 +1,7 @@
+// Admin — Administration Page
 import React, { useState } from 'react';
 import { useKeycloak } from '../context/KeycloakContext';
+import { Rocket, Server, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import Layout from '../components/Layout';
 import './Admin.css';
 
@@ -34,28 +36,72 @@ function Admin() {
     }
   };
 
+  const hasError = result?.error || (result?.exitCode && result.exitCode !== 0);
+
   return (
     <Layout>
-      <div className="admin-panel">
-        <h2>Admin</h2>
-        <div className="admin-row">
-          <div className="admin-label">Backend API URL</div>
-          <div className="admin-value">{BACKEND_URL || 'Not configured'}</div>
-        </div>
+      <h2 style={{ marginBottom: 24 }}>Administrasi</h2>
 
-        <div className="admin-row">
-          <div className="admin-label">Deploy Control</div>
-          <div className="admin-value">
-            <button disabled={!canManage || deploying} onClick={triggerDeploy} className="deploy-btn">
-              {deploying ? 'Deploying…' : 'Trigger Deploy'}
-            </button>
+      <div className="admin-grid">
+        {/* Backend API Info */}
+        <div className="card admin-info-card">
+          <div className="admin-info-icon">
+            <Server size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <div className="admin-info-label">Backend API URL</div>
+            <div className="admin-info-value">{BACKEND_URL || 'Belum dikonfigurasi'}</div>
           </div>
         </div>
 
-        {result && (
-          <pre className="admin-result">{JSON.stringify(result, null, 2)}</pre>
-        )}
+        {/* Deploy Control */}
+        <div className="card admin-deploy-card">
+          <div className="admin-deploy-header">
+            <Rocket size={20} aria-hidden="true" />
+            <h3>Deploy Control</h3>
+          </div>
+          <p className="admin-deploy-desc">
+            Trigger build dan restart PM2 di server produksi.
+          </p>
+          <button
+            disabled={!canManage || deploying}
+            onClick={triggerDeploy}
+            className="admin-deploy-btn"
+            aria-label="Trigger deployment ke produksi"
+          >
+            {deploying ? (
+              <>
+                <Loader2 size={18} className="admin-spinner" aria-hidden="true" />
+                Deploying…
+              </>
+            ) : (
+              <>
+                <Rocket size={18} aria-hidden="true" />
+                Trigger Deploy
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Deploy Result */}
+      {result && (
+        <div
+          className={`card admin-result ${hasError ? 'admin-result--error' : 'admin-result--success'}`}
+          role="status"
+          aria-live="polite"
+        >
+          <div className="admin-result-header">
+            {hasError ? (
+              <AlertCircle size={18} aria-hidden="true" />
+            ) : (
+              <CheckCircle size={18} aria-hidden="true" />
+            )}
+            <span>{hasError ? 'Deploy gagal' : 'Deploy berhasil'}</span>
+          </div>
+          <pre className="admin-result-output">{JSON.stringify(result, null, 2)}</pre>
+        </div>
+      )}
     </Layout>
   );
 }

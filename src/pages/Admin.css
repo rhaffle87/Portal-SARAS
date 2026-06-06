@@ -1,16 +1,156 @@
-.admin-panel {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
+/* ============================================
+   Admin — Administration Page
+   ============================================ */
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
-.admin-row {
+
+/* ---- Info Card ---- */
+.admin-info-card {
   display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  gap: 16px;
 }
-.admin-row:last-child { border-bottom: none; }
-.admin-label { font-weight: 700; }
-.admin-value { text-align: right; }
-.deploy-btn { padding: 8px 12px; border-radius: 8px; background: #0053a0; color: white; border: none; cursor: pointer; }
-.admin-result { margin-top: 12px; background: #f7f7f7; padding: 12px; border-radius: 8px; font-size: 12px; }
+
+.admin-info-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.admin-info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+/* ---- Deploy Card ---- */
+.admin-deploy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-deploy-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-primary);
+}
+
+.admin-deploy-header h3 {
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.admin-deploy-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.admin-deploy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-base),
+              box-shadow var(--transition-base);
+  align-self: flex-start;
+}
+
+.admin-deploy-btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-deploy-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.admin-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* ---- Result ---- */
+.admin-result {
+  margin-top: 16px;
+}
+
+.admin-result--success {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.admin-result--error {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.admin-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.admin-result--success .admin-result-header {
+  color: #166534;
+}
+
+.admin-result--error .admin-result-header {
+  color: #991B1B;
+}
+
+.admin-result-output {
+  font-size: 12px;
+  font-family: 'Fira Code', monospace;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 767px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
