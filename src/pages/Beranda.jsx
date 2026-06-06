@@ -1,7 +1,8 @@
 // HomePage.jsx
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Beranda.css';
+import Layout from '../components/Layout';
 import services from '../config/services';
 import { fetchAnnouncements, checkServiceHealth } from '../services/backend';
 import { useKeycloak } from '../context/KeycloakContext';
@@ -52,25 +53,8 @@ function Beranda() {
   const username = profile?.username || profile?.email || 'Pengguna S4RAS';
 
   return (
-    <div className="portal-container">
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <h1 className="logo"><span>S4RAS</span> Portal</h1>
-        </div>
-        <nav className="sidebar-menu">
-          <NavLink to="/home" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
-            🏠 Beranda
-          </NavLink>
-          <NavLink to="/akun" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
-            👤 Akun
-          </NavLink>
-          <NavLink to="/pengumuman" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
-            📢 Pengumuman
-          </NavLink>
-        </nav>
-      </aside>
-
-      <main className="main-content home-layout">
+    <Layout>
+      <div className="home-layout">
         <div className="left-column">
           <div className="apps-section">
             <h2>Aplikasi dan Layanan</h2>
@@ -144,8 +128,8 @@ function Beranda() {
             <Link to="/pengumuman" className="view-all-announcements">Lihat Semua Pengumuman</Link>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 }
 

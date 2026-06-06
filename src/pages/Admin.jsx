@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useKeycloak } from '../context/KeycloakContext';
+import Layout from '../components/Layout';
 import './Admin.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_API_URL || '';
@@ -34,26 +35,28 @@ function Admin() {
   };
 
   return (
-    <div className="admin-panel">
-      <h2>Admin</h2>
-      <div className="admin-row">
-        <div className="admin-label">Backend API URL</div>
-        <div className="admin-value">{BACKEND_URL || 'Not configured'}</div>
-      </div>
-
-      <div className="admin-row">
-        <div className="admin-label">Deploy Control</div>
-        <div className="admin-value">
-          <button disabled={!canManage || deploying} onClick={triggerDeploy} className="deploy-btn">
-            {deploying ? 'Deploying…' : 'Trigger Deploy'}
-          </button>
+    <Layout>
+      <div className="admin-panel">
+        <h2>Admin</h2>
+        <div className="admin-row">
+          <div className="admin-label">Backend API URL</div>
+          <div className="admin-value">{BACKEND_URL || 'Not configured'}</div>
         </div>
-      </div>
 
-      {result && (
-        <pre className="admin-result">{JSON.stringify(result, null, 2)}</pre>
-      )}
-    </div>
+        <div className="admin-row">
+          <div className="admin-label">Deploy Control</div>
+          <div className="admin-value">
+            <button disabled={!canManage || deploying} onClick={triggerDeploy} className="deploy-btn">
+              {deploying ? 'Deploying…' : 'Trigger Deploy'}
+            </button>
+          </div>
+        </div>
+
+        {result && (
+          <pre className="admin-result">{JSON.stringify(result, null, 2)}</pre>
+        )}
+      </div>
+    </Layout>
   );
 }
 

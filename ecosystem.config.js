@@ -25,7 +25,8 @@ module.exports = {
       watch: false,
       env: {
         NODE_ENV: 'production',
-        DEPLOY_TOKEN: 'changeme',
+        // Set DEPLOY_TOKEN in your environment before starting PM2
+        DEPLOY_TOKEN: process.env.DEPLOY_TOKEN || '',
         DEPLOY_SERVER_PORT: 4000
       }
     }
