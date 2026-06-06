@@ -18,17 +18,29 @@ A React-based portal application integrated with Keycloak SSO for `portal.s4ras.
 
 ## Scripts
 
-### `npm start`
+### `npm run dev`
 
-Run the app in development mode.
+Run the app in development mode using Vite.
 
 ### `npm run build`
 
-Build the app for production.
+Build the app for production with Vite.
+
+### `npm run preview`
+
+Preview the production build locally.
 
 ### `npm test`
 
-Run tests.
+Run test suites with Vitest.
+
+### `npm run lint`
+
+Run source linting for JavaScript and JSX files.
+
+### `npm run audit`
+
+Run npm security audit with a moderate vulnerability threshold.
 
 ## Deployment
 

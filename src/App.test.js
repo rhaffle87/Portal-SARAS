@@ -1,6 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+/* global vi */
 
-jest.mock('./context/KeycloakContext', () => ({
+import React from 'react';
+import App from './App';
+import { render, screen } from '@testing-library/react';
+
+vi.mock('./context/KeycloakContext', () => ({
   KeycloakProvider: ({ children }) => children,
   useKeycloak: () => ({
     authenticated: true,
@@ -13,9 +17,9 @@ jest.mock('./context/KeycloakContext', () => ({
 }));
 
 beforeAll(() => {
-  global.fetch = jest.fn().mockResolvedValue({
+  global.fetch = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => ({}),
+    json: async () => ({})
   });
 });
 
@@ -23,9 +27,7 @@ afterAll(() => {
   global.fetch.mockRestore?.();
 });
 
-import App from './App';
-
 test('renders the portal home page', async () => {
-  render(<App />);
-  await waitFor(() => expect(screen.getByText(/Aplikasi dan Layanan/i)).toBeInTheDocument());
+  render(React.createElement(App));
+  expect(await screen.findByText(/Aplikasi dan Layanan/i)).toBeInTheDocument();
 });

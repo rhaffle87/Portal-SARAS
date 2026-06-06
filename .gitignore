@@ -28,3 +28,9 @@ yarn-error.log*
 .ssh/id_rsa
 id_rsa
 .env.deploy
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo

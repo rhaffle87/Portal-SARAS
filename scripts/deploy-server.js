@@ -1,16 +1,18 @@
 const express = require('express');
 const { spawn } = require('child_process');
-const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.DEPLOY_SERVER_PORT || 4000;
 const TOKEN = process.env.DEPLOY_TOKEN || 'changeme';
+const ALLOWED_ORIGIN = process.env.DEPLOY_ALLOWED_ORIGIN || null;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Simple CORS for local admin UI
+// Restrict CORS to a configured origin for the admin UI.
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  if (ALLOWED_ORIGIN) {
+    res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Deploy-Token');
   if (req.method === 'OPTIONS') return res.sendStatus(200);

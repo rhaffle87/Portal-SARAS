@@ -55,7 +55,7 @@ jobs:
           ssh-keygen -l -f ~/.ssh/id_rsa || { echo 'Invalid SSH private key'; exit 1; }
 
           # Add host to known_hosts; support ED25519 and RSA
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
+          ssh-keyscan -t rsa,ed25519 -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
             echo "Warning: ssh-keyscan failed; proceeding with StrictHostKeyChecking=accept-new"
 
           # Create SSH config for this host
@@ -72,14 +72,14 @@ jobs:
 
       - name: Test SSH connection
         run: |
-          ssh -v target-server "echo 'SSH connection successful'" || exit 1
+          ssh -o BatchMode=yes -v target-server "echo 'SSH connection successful'" || exit 1
 
       - name: Copy build to remote server
         run: |
-          scp -r -P "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_rsa -o ConnectTimeout=10 \
+          scp -o BatchMode=yes -r -P "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_rsa -o ConnectTimeout=10 \
             build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_TARGET_PATH }}"
 
       - name: Restart PM2 on remote server
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_rsa "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+          ssh -o BatchMode=yes -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_rsa "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "cd ${{ secrets.SSH_TARGET_PATH }} && pm2 restart portal-prod || pm2 start serve --name portal-prod -- -s build -l 3000"

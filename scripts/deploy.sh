@@ -10,7 +10,7 @@ printf "> Building React app\n"
 export REACT_APP_BACKEND_API_URL=${REACT_APP_BACKEND_API_URL:-https://api.s4ras.site}
 echo "> Using REACT_APP_BACKEND_API_URL=$REACT_APP_BACKEND_API_URL"
 export REACT_APP_DEPLOY_TOKEN=${REACT_APP_DEPLOY_TOKEN:-changeme}
-echo "> Using REACT_APP_DEPLOY_TOKEN=${REACT_APP_DEPLOY_TOKEN}"
+echo "> Using deployment token from environment"
 npm run build
 
 printf "> Restarting PM2 service portal-prod\n"
