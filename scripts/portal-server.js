@@ -97,7 +97,8 @@ app.get('/api/health', (_req, res) => {
 
 // ── Static file serving (SPA mode, replaces `serve -s build`) ──────────────
 app.use(express.static(BUILD_DIR));
-app.get('*', (_req, res) => {
+// Express 5 requires named wildcard params — '*' alone is invalid
+app.get('/{*splat}', (_req, res) => {
   res.sendFile(path.join(BUILD_DIR, 'index.html'));
 });
 
