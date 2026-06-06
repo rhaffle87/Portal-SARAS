@@ -79,6 +79,10 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+html.light .clear-search-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
 /* Announcement Cards Grid */
 .pengumuman-grid {
   display: grid;
@@ -98,7 +102,7 @@
 }
 
 .pengumuman-card:hover {
-  border-color: rgba(2, 132, 199, 0.25);
+  border-color: rgba(239, 68, 68, 0.25);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
 }
 
@@ -135,10 +139,22 @@
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
+html.light .badge--danger {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
 .badge--info {
   background: rgba(59, 130, 246, 0.12);
   color: #93c5fd;
   border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+html.light .badge--info {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .badge--success {
@@ -147,10 +163,22 @@
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
+html.light .badge--success {
+  background: rgba(16, 185, 129, 0.08);
+  color: #16a34a;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
 .badge--default {
   background: rgba(255, 255, 255, 0.04);
   color: #d1d5db;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.light .badge--default {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--color-text-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* Content */

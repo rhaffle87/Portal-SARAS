@@ -4,10 +4,10 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   
   /* Brand colors matching myITS reference */
-  --color-brand: #006097;
-  --color-brand-hover: #0076ba;
-  --color-brand-light: #0284c7;
-  --color-brand-subtle: rgba(0, 96, 151, 0.15);
+  --color-brand: #b91c1c;
+  --color-brand-hover: #dc2626;
+  --color-brand-light: #ef4444;
+  --color-brand-subtle: rgba(185, 28, 28, 0.15);
 
   /* Dark theme background tones */
   --color-neutral-bg1: #0a0c10;
@@ -50,10 +50,10 @@
     color-scheme: light;
     
     /* Brand overrides */
-    --color-brand: #006097;
-    --color-brand-hover: #004d7a;
-    --color-brand-light: #0284c7;
-    --color-brand-subtle: rgba(0, 96, 151, 0.08);
+    --color-brand: #dc2626;
+    --color-brand-hover: #b91c1c;
+    --color-brand-light: #ef4444;
+    --color-brand-subtle: rgba(220, 38, 38, 0.08);
 
     /* Light theme background tones */
     --color-neutral-bg1: #f3f4f6; /* light grey page bg */
@@ -144,7 +144,7 @@
 .glass-input:focus {
   border-color: var(--color-brand-light);
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 15px rgba(2, 130, 199, 0.15);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
 }
 
 /* Light Mode Glassmorphism Overrides */
@@ -172,7 +172,7 @@ html.light .glass-input {
 
 html.light .glass-input:focus {
   background: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 0 15px rgba(2, 130, 199, 0.1);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
 }
 
 /* General layout card adjustments */

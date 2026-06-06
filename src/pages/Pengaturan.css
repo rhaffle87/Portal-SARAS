@@ -32,7 +32,7 @@
 }
 
 .settings-card:hover {
-  border-color: rgba(2, 130, 199, 0.2);
+  border-color: rgba(239, 68, 68, 0.2);
   transform: none; /* Keep static, no translateY on settings row cards */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
@@ -107,7 +107,7 @@
 .dropdown-btn:focus-visible {
   outline: none;
   border-color: var(--color-brand-light);
-  box-shadow: 0 0 10px rgba(2, 130, 199, 0.2);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
 }
 
 .dropdown-menu {

@@ -7,7 +7,10 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--color-neutral-bg1);
+  background-color: transparent;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
 
 /* Global Top Bar */
@@ -23,6 +26,10 @@
   justify-content: space-between;
   padding: 0 1.5rem;
   z-index: 40;
+}
+
+html.light .portal-topbar {
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .topbar-logo-section {
@@ -69,9 +76,17 @@
   transition: all 0.2s ease;
 }
 
+html.light .lang-btn {
+  background: rgba(0, 0, 0, 0.03);
+}
+
 .lang-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--color-text-primary);
+}
+
+html.light .lang-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .lang-menu {
@@ -126,8 +141,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 96, 151, 0.25);
+  box-shadow: 0 2px 10px rgba(185, 28, 28, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.light .avatar-circle {
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* Sidebar Toggle for Mobile */
@@ -201,7 +220,7 @@
   background-color: var(--color-brand) !important;
   color: #ffffff !important;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 96, 151, 0.3);
+  box-shadow: 0 4px 15px rgba(185, 28, 28, 0.3);
 }
 
 .menu-item--logout {
@@ -262,5 +281,75 @@
 
   .main-content {
     padding: 1.5rem;
+  }
+}
+
+/* Ambient background subtle glows */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(120px);
+  will-change: transform, opacity;
+}
+
+.glow-1 {
+  top: 10%;
+  left: -250px;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.16) 0%, transparent 90%);
+  animation: pulse-glow-1 10s infinite alternate ease-in-out;
+}
+
+.glow-2 {
+  bottom: -200px;
+  right: -200px;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.10) 0%, transparent 90%);
+  animation: pulse-glow-2 14s infinite alternate ease-in-out;
+}
+
+html.light .glow-1 {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.06) 0%, transparent 90%);
+}
+
+html.light .glow-2 {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.03) 0%, transparent 90%);
+}
+
+@keyframes pulse-glow-1 {
+  0% {
+    opacity: 0.5;
+    transform: translate(0, 0) scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(-30px, 20px) scale(1.1);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: translate(0, 0) scale(0.9);
+  }
+}
+
+@keyframes pulse-glow-2 {
+  0% {
+    opacity: 0.4;
+    transform: translate(0, 0) scale(0.95);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: translate(40px, -30px) scale(1.05);
+  }
+
+  100% {
+    opacity: 0.4;
+    transform: translate(0, 0) scale(0.95);
   }
 }

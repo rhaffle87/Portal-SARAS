@@ -102,7 +102,7 @@
 
 .btn-trigger-deploy:hover:not(:disabled) {
   background: var(--color-brand-hover);
-  box-shadow: 0 4px 12px rgba(2, 130, 199, 0.25);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
 .btn-trigger-deploy:disabled {

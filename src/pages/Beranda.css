@@ -10,9 +10,10 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--color-border-default);
-  min-height: 130px;
+  min-height: 400px;
   display: flex;
-  align-items: center;
+  align-items: end;
+  padding: 2.5rem 2rem;
 }
 
 .welcome-banner-bg {
@@ -35,12 +36,12 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(135deg, rgba(10, 12, 16, 0.9) 0%, rgba(20, 22, 32, 0.8) 50%, rgba(20, 22, 32, 0.4) 100%);
+  background: linear-gradient(to top, rgba(20, 5, 5, 0.95) 0%, rgba(185, 28, 28, 0.25) 40%, transparent 100%);
   transition: background 0.3s ease;
 }
 
 html.light .welcome-banner-overlay {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(243, 244, 246, 0.6) 100%);
+  background: linear-gradient(to top, rgba(254, 242, 242, 0.95) 0%, rgba(239, 68, 68, 0.12) 40%, transparent 100%);
 }
 
 .welcome-banner-content {
@@ -118,7 +119,7 @@ html.light .welcome-banner-overlay {
 
 .app-card:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(2, 132, 199, 0.3);
+  border-color: rgba(239, 68, 68, 0.3);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
@@ -210,6 +211,11 @@ html.light .welcome-banner-overlay {
   background: linear-gradient(135deg, rgba(20, 22, 32, 0.5) 0%, rgba(10, 12, 16, 0.7) 100%);
 }
 
+html.light .profile-widget {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(243, 244, 246, 0.9) 100%);
+  border-color: var(--color-border-default);
+}
+
 .profile-widget-header {
   display: flex;
   align-items: center;
@@ -225,7 +231,7 @@ html.light .welcome-banner-overlay {
   border-radius: 50%;
   background: var(--color-brand-subtle);
   color: var(--color-brand-light);
-  border: 1px solid rgba(2, 132, 199, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
 .widget-name {
@@ -385,6 +391,7 @@ html.light .welcome-banner-overlay {
   .home-layout {
     flex-direction: column;
   }
+
   .right-column {
     min-width: 0;
   }

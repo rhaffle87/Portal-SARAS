@@ -1,7 +1,32 @@
 // Beranda — Home Dashboard
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ChevronRight, User, Activity, AlertCircle } from 'lucide-react';
+import { 
+  ExternalLink, 
+  ChevronRight, 
+  User, 
+  Activity, 
+  AlertCircle,
+  GraduationCap,
+  KeyRound,
+  Cloud,
+  Tv,
+  Phone,
+  BarChart3
+} from 'lucide-react';
+
+const ServiceIcon = ({ iconName, size = 20, className }) => {
+  const IconComponent = {
+    GraduationCap,
+    KeyRound,
+    Cloud,
+    Tv,
+    Phone,
+    BarChart3
+  }[iconName] || Activity;
+  
+  return <IconComponent size={size} className={className} />;
+};
 import { motion, AnimatePresence } from 'framer-motion';
 import './Beranda.css';
 import Layout from '../components/Layout';
@@ -176,7 +201,7 @@ function Beranda() {
                     aria-label={`${service.title} — ${getServiceDesc(service.key, service.description)}`}
                   >
                     <div className="app-icon-wrapper">
-                      <span className="app-icon-emoji" aria-hidden="true">{service.icon}</span>
+                      <ServiceIcon iconName={service.iconName} size={20} aria-hidden="true" />
                     </div>
                     <div className="app-info">
                       <div className="app-name">{service.title}</div>

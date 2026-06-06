@@ -37,6 +37,11 @@
   overflow: hidden;
 }
 
+html.light .akun-profile-hero {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(243, 244, 246, 0.9) 100%);
+  border-color: var(--color-border-default);
+}
+
 .akun-profile-hero::before {
   content: '';
   position: absolute;
@@ -44,7 +49,7 @@
   right: 0;
   width: 250px;
   height: 100%;
-  background: radial-gradient(circle, rgba(2, 132, 199, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -57,14 +62,14 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: radial-gradient(circle at top left, #38bdf8 0%, #006097 100%);
+  background: radial-gradient(circle at top left, #f87171 0%, #991b1b 100%);
   color: #ffffff;
   font-size: 2.25rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(0, 96, 151, 0.3);
+  box-shadow: 0 4px 20px rgba(185, 28, 28, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
