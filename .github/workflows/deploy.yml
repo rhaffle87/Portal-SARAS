@@ -46,25 +46,30 @@ jobs:
       - name: Prepare SSH key and config
         run: |
           mkdir -p ~/.ssh
-          # Write the private key, handling potential Windows line endings
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | sed 's/\r$//' > ~/.ssh/id_rsa
+
+          # Write the private key into the file exactly as stored in the secret
+          cat > ~/.ssh/id_rsa << 'EOF'
+${{ secrets.SSH_PRIVATE_KEY }}
+EOF
           chmod 600 ~/.ssh/id_rsa
-          
-          # Add host to known_hosts with fallback
-          ssh-keyscan -t rsa -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
-            ssh-keyscan -t rsa "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
-            echo "Warning: ssh-keyscan failed; proceeding with StrictHostKeyChecking=no"
-          
+
+          # Validate the private key format
+          ssh-keygen -l -f ~/.ssh/id_rsa || { echo 'Invalid SSH private key'; exit 1; }
+
+          # Add host to known_hosts; support ED25519 and RSA
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || \
+            echo "Warning: ssh-keyscan failed; proceeding with StrictHostKeyChecking=accept-new"
+
           # Create SSH config for this host
           cat > ~/.ssh/config << EOF
-          Host target-server
-            HostName ${{ secrets.SSH_HOST }}
-            Port ${{ secrets.SSH_PORT }}
-            User ${{ secrets.SSH_USER }}
-            IdentityFile ~/.ssh/id_rsa
-            StrictHostKeyChecking accept-new
-            UserKnownHostsFile ~/.ssh/known_hosts
-          EOF
+Host target-server
+  HostName ${{ secrets.SSH_HOST }}
+  Port ${{ secrets.SSH_PORT }}
+  User ${{ secrets.SSH_USER }}
+  IdentityFile ~/.ssh/id_rsa
+  StrictHostKeyChecking accept-new
+  UserKnownHostsFile ~/.ssh/known_hosts
+EOF
           chmod 600 ~/.ssh/config
 
       - name: Test SSH connection
