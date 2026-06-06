@@ -49,105 +49,55 @@ const getTimeoutSignal = (ms) => {
   return controller.signal;
 };
 
+// When no external backend API is configured, use the built-in health API
+// served by portal-server.js on the same origin (no CORS, no no-cors hacks).
+const HEALTH_BASE = BACKEND_API_BASE || '';
+
 export const checkServiceHealth = async (service) => {
   const startTime = performance.now();
-  
-  // 1. Try backend API health check first if base URL is set
-  if (BACKEND_API_BASE) {
-    try {
-      const res = await fetch(`${BACKEND_API_BASE}/health/${service.key}`, {
-        cache: 'no-store',
-        signal: getTimeoutSignal(5000),
-      });
-      const latency = Math.round(performance.now() - startTime);
-      if (res.ok) {
-        const data = await res.json().catch(() => null);
-        const statusStr = (data?.status || '').toLowerCase();
-        if (statusStr === 'online' || statusStr === 'ok' || statusStr === 'up') {
-          return {
-            key: service.key,
-            status: 'online',
-            label: data?.status || 'Online',
-            details: data?.message || service.url,
-            latency,
-          };
-        }
-      }
-      
-      // If the backend responded but it wasn't ok/online, trust the backend response and mark it offline.
-      // Do not fall back to browser checks.
-      return {
-        key: service.key,
-        status: 'offline',
-        label: 'Offline',
-        details: `Backend returned status ${res.status}`,
-        latency: null,
-      };
-    } catch (error) {
-      console.warn(`Backend health check failed for ${service.key}, falling back to browser check.`, error);
-    }
-  }
-
-  // 2. Client-side browser fallback check (direct fetch)
-  // Prevent false-positives for proxy 502/503 responses:
-  // If the backend base URL was defined but the fetch failed (backend down), or if this is not the SSO service,
-  // we default to offline as client-side check with 'no-cors' resolves on proxy error pages.
-  if (service.key !== 'sso' && BACKEND_API_BASE) {
-    return {
-      key: service.key,
-      status: 'offline',
-      label: 'Offline',
-      details: 'Backend health check unreachable',
-      latency: null,
-    };
-  }
 
   try {
-    const fetchStart = performance.now();
-    // Try GET with mode: 'no-cors' since some web servers/gateways reject HEAD requests
-    await fetch(service.url, {
-      method: 'GET',
-      mode: 'no-cors',
+    const endpoint = BACKEND_API_BASE
+      ? `${BACKEND_API_BASE}/health/${service.key}`   // external backend
+      : `/api/health/${service.key}`;                  // built-in same-origin
+
+    const res = await fetch(endpoint, {
       cache: 'no-store',
-      signal: getTimeoutSignal(5000),
+      signal: getTimeoutSignal(8000), // server-side probes need a bit more time
     });
-    const latency = Math.round(performance.now() - fetchStart);
-    return {
-      key: service.key,
-      status: 'online',
-      label: 'Online',
-      details: service.url,
-      latency,
-    };
-  } catch (publicError) {
-    // 3. Special Local Fallback: If running on HTTP (e.g., localhost), try the internal URL directly
-    if (window.location.protocol === 'http:' && service.internalUrl) {
-      try {
-        const localStart = performance.now();
-        await fetch(service.internalUrl, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-store',
-          signal: getTimeoutSignal(3000),
-        });
-        const latency = Math.round(performance.now() - localStart);
+
+    const latency = Math.round(performance.now() - startTime);
+
+    if (res.ok) {
+      const data = await res.json().catch(() => null);
+      const statusStr = (data?.status || '').toLowerCase();
+
+      if (statusStr === 'online' || statusStr === 'ok' || statusStr === 'up') {
         return {
           key: service.key,
           status: 'online',
-          label: 'Online (Lokal)',
-          details: service.internalUrl,
-          latency,
+          label: data?.status || 'Online',
+          details: data?.message || service.url,
+          latency: data?.latency ?? latency,
         };
-      } catch (internalError) {
-        // Fall through
       }
     }
 
+    // Health API responded but service is not online
     return {
       key: service.key,
       status: 'offline',
       label: 'Offline',
-      details: publicError.message || 'Koneksi gagal',
+      details: `Health check returned non-online status`,
+      latency: null,
+    };
+  } catch (error) {
+    // Health API itself is unreachable (network error / timeout)
+    return {
+      key: service.key,
+      status: 'offline',
+      label: 'Offline',
+      details: error.message || 'Health API unreachable',
       latency: null,
     };
   }
