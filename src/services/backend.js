@@ -50,6 +50,8 @@ const getTimeoutSignal = (ms) => {
 };
 
 export const checkServiceHealth = async (service) => {
+  const startTime = performance.now();
+  
   // 1. Try backend API health check first if base URL is set
   if (BACKEND_API_BASE) {
     try {
@@ -57,6 +59,7 @@ export const checkServiceHealth = async (service) => {
         cache: 'no-store',
         signal: getTimeoutSignal(5000),
       });
+      const latency = Math.round(performance.now() - startTime);
       if (res.ok) {
         const data = await res.json().catch(() => null);
         const statusStr = (data?.status || '').toLowerCase();
@@ -66,6 +69,7 @@ export const checkServiceHealth = async (service) => {
             status: 'online',
             label: data?.status || 'Online',
             details: data?.message || service.url,
+            latency,
           };
         }
       }
@@ -77,6 +81,7 @@ export const checkServiceHealth = async (service) => {
         status: 'offline',
         label: 'Offline',
         details: `Backend returned status ${res.status}`,
+        latency: null,
       };
     } catch (error) {
       console.warn(`Backend health check failed for ${service.key}, falling back to browser check.`, error);
@@ -93,10 +98,12 @@ export const checkServiceHealth = async (service) => {
       status: 'offline',
       label: 'Offline',
       details: 'Backend health check unreachable',
+      latency: null,
     };
   }
 
   try {
+    const fetchStart = performance.now();
     // Try GET with mode: 'no-cors' since some web servers/gateways reject HEAD requests
     await fetch(service.url, {
       method: 'GET',
@@ -104,27 +111,32 @@ export const checkServiceHealth = async (service) => {
       cache: 'no-store',
       signal: getTimeoutSignal(5000),
     });
+    const latency = Math.round(performance.now() - fetchStart);
     return {
       key: service.key,
       status: 'online',
       label: 'Online',
       details: service.url,
+      latency,
     };
   } catch (publicError) {
     // 3. Special Local Fallback: If running on HTTP (e.g., localhost), try the internal URL directly
     if (window.location.protocol === 'http:' && service.internalUrl) {
       try {
+        const localStart = performance.now();
         await fetch(service.internalUrl, {
           method: 'GET',
           mode: 'no-cors',
           cache: 'no-store',
           signal: getTimeoutSignal(3000),
         });
+        const latency = Math.round(performance.now() - localStart);
         return {
           key: service.key,
           status: 'online',
           label: 'Online (Lokal)',
           details: service.internalUrl,
+          latency,
         };
       } catch (internalError) {
         // Fall through
@@ -136,6 +148,7 @@ export const checkServiceHealth = async (service) => {
       status: 'offline',
       label: 'Offline',
       details: publicError.message || 'Koneksi gagal',
+      latency: null,
     };
   }
 };

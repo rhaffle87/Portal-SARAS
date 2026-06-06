@@ -37,6 +37,32 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
+
+  /* Custom Glow Animations */
+  --animate-pulse-glow-1: pulse-glow-1 10s infinite alternate ease-in-out;
+  --animate-pulse-glow-2: pulse-glow-2 14s infinite alternate ease-in-out;
+
+  @keyframes pulse-glow-1 {
+    0%, 100% {
+      opacity: 0.5;
+      transform: translate(0, 0) scale(0.9);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(-30px, 20px) scale(1.1);
+    }
+  }
+
+  @keyframes pulse-glow-2 {
+    0%, 100% {
+      opacity: 0.4;
+      transform: translate(0, 0) scale(0.95);
+    }
+    50% {
+      opacity: 0.9;
+      transform: translate(40px, -30px) scale(1.05);
+    }
+  }
 }
 
 /* Base custom definitions */
