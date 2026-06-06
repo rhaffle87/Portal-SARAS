@@ -5,10 +5,9 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy:
-    name: Build and deploy
+  build_and_upload:
+    name: Build and upload artifact
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,23 +23,38 @@ jobs:
       - name: Build app
         run: npm run build
 
-      - name: Copy build to remote server
-        uses: appleboy/scp-action@v0.1.0
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          source: "build/*"
-          target: ${{ secrets.SSH_TARGET_PATH }}
+          name: build
+          path: build
 
-      - name: Restart PM2 service on remote server
-        uses: appleboy/ssh-action@v0.1.6
+  deploy:
+    name: Deploy on self-hosted runner
+    needs: build_and_upload
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Checkout repository (for provenance)
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script: |
-            cd ${{ secrets.SSH_TARGET_PATH }}
-            pm2 restart portal-prod || pm2 start serve --name portal-prod -- -s build -l 3000
+          name: build
+          path: build
+
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts || true
+
+      - name: Copy build to remote server
+        run: |
+          scp -r -P "${{ secrets.SSH_PORT }}" build/* "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_TARGET_PATH }}"
+
+      - name: Restart PM2 on remote server
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "cd ${SSH_TARGET_PATH:-${{ secrets.SSH_TARGET_PATH }}} && pm2 restart portal-prod || pm2 start serve --name portal-prod -- -s build -l 3000"

@@ -21,3 +21,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local self-hosted runner and SSH keys
+/actions-runner/
+/actions-runner/*
+.ssh/id_rsa
+id_rsa
+.env.deploy

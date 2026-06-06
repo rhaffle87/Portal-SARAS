@@ -72,17 +72,9 @@ If you want deployment from GitHub to the server, you can extend the workflow wi
 ## Remote deployment from GitHub
 
 A secondary workflow is included at `.github/workflows/deploy.yml`.
-It builds the app on every push to `main`, copies the `build` folder to the remote server, and restarts the `portal-prod` PM2 process.
+It builds the app on every push to `main`, uploads the build as an artifact, and then runs the deploy job on a self-hosted runner inside your network to copy files to the target server and restart PM2.
 
-To use it, configure these GitHub repository secrets:
-
-- `SSH_HOST`
-- `SSH_USER`
-- `SSH_PRIVATE_KEY`
-- `SSH_TARGET_PATH`
-- `SSH_PORT` (optional, default `22`)
-
-Then push to `main` and GitHub Actions will deploy automatically.
+See [DEPLOY.md](DEPLOY.md) for detailed instructions on registering a self-hosted runner, setting repository secrets, and securing SSH keys.
 
 ## License
 
