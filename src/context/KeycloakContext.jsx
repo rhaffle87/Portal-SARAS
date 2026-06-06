@@ -34,6 +34,62 @@ export const KeycloakProvider = ({ children }) => {
   }, [keycloak, authenticated, profile]);
 
   useEffect(() => {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    if (isLocal) {
+      console.debug('[Keycloak] Local development detected — bypassing Keycloak and using mock profile');
+      
+      const mockProfile = {
+        username: 'testuser',
+        email: 'testuser@s4ras.site',
+        firstName: 'Test',
+        lastName: 'User',
+        attributes: {
+          role: ['admin']
+        }
+      };
+
+      const mockKeycloak = {
+        realmAccess: { roles: ['admin'] },
+        resourceAccess: { 'front-end': { roles: ['admin'] } },
+        token: 'mock-token',
+        tokenParsed: { preferred_username: 'testuser' },
+        loadUserProfile: async () => mockProfile,
+        login: () => {
+          console.debug('[Keycloak] Mock login triggered');
+          localStorage.setItem('saras-mock-authed', 'true');
+          window.location.reload();
+        },
+        logout: () => {
+          console.debug('[Keycloak] Mock logout triggered');
+          localStorage.setItem('saras-mock-authed', 'false');
+          window.location.reload();
+        }
+      };
+
+      setKeycloak(mockKeycloak);
+      
+      const authed = localStorage.getItem('saras-mock-authed') !== 'false';
+      if (authed) {
+        setProfile(mockProfile);
+        setAuthenticated(true);
+      } else {
+        setProfile(null);
+        setAuthenticated(false);
+      }
+      setInitialized(true);
+
+      // Auto login if not authenticated
+      if (!authed) {
+        setTimeout(() => {
+          console.debug('[Keycloak] Auto logging in mock developer');
+          mockKeycloak.login();
+        }, 1000);
+      }
+
+      return;
+    }
+
     const keycloakInstance = new Keycloak({
       url: 'https://sso.s4ras.site', 
       realm: 'S4RAS',
