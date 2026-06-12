@@ -1,6 +1,5 @@
 // Akun — Account Page
-import { Link } from 'react-router-dom';
-import { UserCircle, Calendar, Mail, ArrowLeft } from 'lucide-react';
+import { UserCircle, Calendar, Mail } from 'lucide-react';
 import { useKeycloak } from '../context/KeycloakContext';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import Layout from '../components/Layout';

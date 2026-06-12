@@ -51,7 +51,6 @@ const getTimeoutSignal = (ms) => {
 
 // When no external backend API is configured, use the built-in health API
 // served by portal-server.js on the same origin (no CORS, no no-cors hacks).
-const HEALTH_BASE = BACKEND_API_BASE || '';
 
 export const checkServiceHealth = async (service) => {
   const startTime = performance.now();

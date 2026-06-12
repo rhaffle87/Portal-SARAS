@@ -1,7 +1,6 @@
 // Pengumuman — Announcements Page
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ArrowLeft, Bell, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Bell, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import { fetchAnnouncements } from '../services/backend';
@@ -65,27 +64,27 @@ function Pengumuman() {
       <div className="flex flex-col gap-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-6 flex-wrap">
           <h2 className="text-[1.75rem] font-semibold text-text-primary m-0">{t('ann.title')}</h2>
-            
-            {/* Search Input Bar */}
-            <div className="relative w-full sm:w-[300px] flex items-center">
-              <Search size={18} className="absolute left-3.5 text-text-muted pointer-events-none" />
-              <input
-                type="text"
-                placeholder={t('ann.search_placeholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-10 py-2.5 rounded-full text-text-primary text-[0.8125rem] glass-input"
-              />
-              {searchTerm && (
-                <button 
-                  className="absolute right-3.5 bg-none border-none text-text-muted cursor-pointer flex items-center justify-center p-0.5 rounded-full transition-all hover:text-text-primary hover:bg-white/8 light:hover:bg-black/5" 
-                  onClick={() => setSearchTerm('')}
-                >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
+
+          {/* Search Input Bar */}
+          <div className="relative w-full sm:w-[300px] flex items-center">
+            <Search size={18} className="absolute left-3.5 text-text-muted pointer-events-none" />
+            <input
+              type="text"
+              placeholder={t('ann.search_placeholder')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-10 py-2.5 rounded-full text-text-primary text-[0.8125rem] glass-input"
+            />
+            {searchTerm && (
+              <button
+                className="absolute right-3.5 bg-none border-none text-text-muted cursor-pointer flex items-center justify-center p-0.5 rounded-full transition-all hover:text-text-primary hover:bg-white/8 light:hover:bg-black/5"
+                onClick={() => setSearchTerm('')}
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" aria-busy="true" aria-label={t('ann.loading')}>
@@ -109,22 +108,22 @@ function Pengumuman() {
                 <p>{t('ann.no_results')}</p>
               </div>
             ) : (
-              <motion.div 
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" 
+              <motion.div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                role="list" 
+                role="list"
                 aria-label={t('ann.title')}
               >
                 <AnimatePresence mode="popLayout">
                   {filteredAnnouncements.map((item, index) => (
-                    <motion.article 
+                    <motion.article
                       variants={cardVariants}
                       whileHover={{ scale: 1.01, translateY: -2 }}
                       layout
                       key={index}
-                      className="card flex flex-col gap-4 p-6 hover:border-brand/25 hover:shadow-[0_10px_25px_rgba(0,0,0,0.35)] light:hover:shadow-[0_10px_25px_rgba(0,0,0,0.04)] transition-all duration-200" 
+                      className="card flex flex-col gap-4 p-6 hover:border-brand/25 hover:shadow-[0_10px_25px_rgba(0,0,0,0.35)] light:hover:shadow-[0_10px_25px_rgba(0,0,0,0.04)] transition-all duration-200"
                       role="listitem"
                     >
                       <div className="flex justify-between items-center">
@@ -135,7 +134,7 @@ function Pengumuman() {
                           {item.badge || item.badgeText || 'Info'}
                         </span>
                       </div>
-                      
+
                       <div className="flex flex-col gap-2">
                         <h3 className="text-[0.9375rem] font-semibold text-text-primary leading-normal m-0">{item.title}</h3>
                         <p className="text-[0.8125rem] text-text-secondary leading-relaxed m-0 line-clamp-3">{item.description || item.desc}</p>

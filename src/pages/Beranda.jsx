@@ -15,6 +15,13 @@ import {
   BarChart3,
   RefreshCw
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Layout from '../components/Layout';
+import SkeletonCard from '../components/SkeletonCard';
+import services from '../config/services';
+import { fetchAnnouncements, checkServiceHealth } from '../services/backend';
+import { useKeycloak } from '../context/KeycloakContext';
+import { useThemeLanguage } from '../context/ThemeLanguageContext';
 
 const ServiceIcon = ({ iconName, size = 20, className }) => {
   const IconComponent = {
@@ -28,13 +35,6 @@ const ServiceIcon = ({ iconName, size = 20, className }) => {
 
   return <IconComponent size={size} className={className} />;
 };
-import { motion, AnimatePresence } from 'framer-motion';
-import Layout from '../components/Layout';
-import SkeletonCard from '../components/SkeletonCard';
-import services from '../config/services';
-import { fetchAnnouncements, checkServiceHealth } from '../services/backend';
-import { useKeycloak } from '../context/KeycloakContext';
-import { useThemeLanguage } from '../context/ThemeLanguageContext';
 
 function Beranda() {
   const [announcements, setAnnouncements] = useState([]);
