@@ -4,7 +4,7 @@
 
 ```bash
 # 1. SSH into VM 208
-ssh portal@192.168.10.208
+ssh portal@100.123.192.3
 
 # 2. Go to the project directory
 cd /home/portal/Portal-SARAS
