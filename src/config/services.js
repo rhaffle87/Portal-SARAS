@@ -26,11 +26,11 @@ const services = [
   },
   {
     key: 'iptv',
-    title: 'Nexaplay IPTV',
+    title: 'Jellyfin IPTV',
     description: 'Layanan IPTV untuk siaran dan konten video.',
     iconName: 'Tv',
     url: 'https://iptv.s4ras.site',
-    internalUrl: 'http://192.168.10.200'
+    internalUrl: 'http://192.168.10.200:8096'
   },
   {
     key: 'voip',

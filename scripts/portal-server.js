@@ -23,7 +23,7 @@ const SERVICES = {
   moodle:  { internal: 'http://192.168.10.203',      public: 'https://moodle.s4ras.site' },
   sso:     { internal: 'http://192.168.10.206:8080',  public: 'https://sso.s4ras.site' },
   cloud:   { internal: 'http://192.168.10.207',       public: 'https://cloud.s4ras.site' },
-  iptv:    { internal: 'http://192.168.10.200',       public: 'https://iptv.s4ras.site' },
+  iptv:    { internal: 'http://192.168.10.200:8096',  public: 'https://iptv.s4ras.site' },
   voip:    { internal: 'http://192.168.10.201:8080',  public: 'https://voip.s4ras.site' },
   monitor: { internal: 'http://192.168.10.204:3000',  public: 'https://monitor.s4ras.site' },
 };

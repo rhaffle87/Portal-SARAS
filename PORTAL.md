@@ -22,7 +22,7 @@ graph TD
     subgraph Internal_Network [Private RFC1918 Network]
         Moodle[Moodle LMS VM 203]
         Cloud[Nextcloud VM 207]
-        IPTV[Nexaplay IPTV VM 200]
+        IPTV[Jellyfin IPTV VM 200:8096]
         VoIP[VoIP Server VM 201]
         Monitor[Monitoring VM 204]
     end

@@ -38,7 +38,7 @@ The architecture operates under a strict **private-first** design. Virtual machi
     *   `sso.s4ras.site` ──> `http://192.168.10.206:8080`
     *   `moodle.s4ras.site` ──> `http://192.168.10.203:80`
     *   `cloud.s4ras.site` ──> `http://192.168.10.207:80`
-    *   `iptv.s4ras.site` ──> `http://192.168.10.200:80`
+    *   `iptv.s4ras.site` ──> `http://192.168.10.200:8096`
     *   `voip.s4ras.site` ──> `http://192.168.10.201:8080`
     *   `monitor.s4ras.site` ──> `http://192.168.10.204:3000`
 
@@ -58,7 +58,7 @@ graph TB
         SSO[SSO Keycloak]
         Moodle[Moodle LMS]
         Nextcloud[Nextcloud SAN]
-        IPTV[Nexaplay IPTV]
+        IPTV[Jellyfin IPTV]
         VoIP[VoIP Server]
         Monitor[Monitoring Dashboard]
     end
@@ -113,7 +113,7 @@ C4Container
         }
 
         System_Boundary(vm_200, "VM 200: IPTV Host") {
-            Container(iptv, "Nexaplay IPTV", "Nginx Stream / Docker", "IPTV server for digital channel streaming.")
+            Container(iptv, "Jellyfin IPTV", "Jellyfin Server / Docker", "Jellyfin media server serving IPTV streaming.")
         }
 
         System_Boundary(vm_201, "VM 201: VoIP Host") {
@@ -138,7 +138,7 @@ C4Container
     Rel(api, keycloak, "Probes internal Keycloak (192.168.10.206:8080)", "HTTP")
     Rel(api, moodle, "Probes internal Moodle (192.168.10.203:80)", "HTTP")
     Rel(api, nextcloud, "Probes internal Nextcloud (192.168.10.207:80)", "HTTP")
-    Rel(api, iptv, "Probes internal IPTV (192.168.10.200:80)", "HTTP")
+    Rel(api, iptv, "Probes internal IPTV (192.168.10.200:8096)", "HTTP")
     Rel(api, voip, "Probes internal VoIP (192.168.10.201:8080)", "HTTP")
     Rel(api, monitor, "Probes internal Monitor (192.168.10.204:3000)", "HTTP")
 ```
